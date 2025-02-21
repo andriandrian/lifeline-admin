@@ -3,11 +3,41 @@
 import Image from "next/image";
 import Logo from "@/public/logo.svg";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { CircleUserRound, Hospital, Inbox, LayoutDashboard, LogOut, Newspaper } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { CircleUserRound, Hospital, Inbox, LayoutDashboard, LogOut, Newspaper, UserRound } from "lucide-react";
+import Cookies from 'js-cookie';
+import { useEffect, useState } from "react";
 
 export default function SideNav() {
     const pathname = usePathname();
+    const [name, setName] = useState<string | null>(null);
+    const router = useRouter();
+
+    useEffect(() => {
+        try {
+            const user = Cookies.get('name');
+            if (user) {
+                setName(user);
+            }
+        } catch (error) {
+            console.error("Error checking token:", error);
+        }
+    }, []);
+
+    async function handleLogout() {
+        if (confirm("Are you sure you want to logout?")) {
+            try {
+                // logout();
+                Cookies.set('token', '', { expires: new Date(0) });
+                Cookies.remove('role');
+                Cookies.remove('name');
+                Cookies.remove('email');
+                router.push('/login');
+            } catch (error) {
+                console.log(error);
+            }
+        }
+    }
 
     return (
         <nav className="h-screen w-full bg-[#690B22] py-3 lg:w-fit lg:py-8 lg:items-center lg:justify-center flex lg:flex-col drop-shadow-md lg:max-w-[280px]">
@@ -26,7 +56,7 @@ export default function SideNav() {
                     <li className={`px-5 py-3 rounded-[4px] min-w-[232px] ${pathname.startsWith("/post") ? "bg-white bg-opacity-20 text-black" : "bg-transparent"}`}>
                         <Link href="/post" className="flex flex-row gap-3 items-center">
                             <Inbox className="text-white" />
-                            <p className={`text-white font-medium`}>Post</p>
+                            <p className={`text-white font-medium`}>Donation Request</p>
                         </Link>
                     </li>
 
@@ -43,18 +73,28 @@ export default function SideNav() {
                             <p className={`text-white font-medium`}>Hospital</p>
                         </Link>
                     </li>
+
+                    <li className={`px-5 py-3 rounded-[4px] min-w-[232px] ${pathname.startsWith("/user") ? "bg-white bg-opacity-20 text-black" : "bg-transparent"}`}>
+                        <Link href="/user" className="flex flex-row gap-3 items-center">
+                            <UserRound className="text-white" />
+                            <p className={`text-white font-medium`}>User</p>
+                        </Link>
+                    </li>
                 </ul>
                 <ul>
                     <li className="flex flex-row justify-between px-10 py-3 rounded-[4px] min-w-[232px] bg-transparent">
                         <div className="flex flex-row gap-3 items-center">
                             <CircleUserRound className="text-white" />
-                            <p className={`text-white font-medium`}>Admin</p>
+                            <p className={`text-white font-medium`}>
+                                {/* {name} */}
+                                {name ? name : "User"}
+                            </p>
                         </div>
 
-                        <Link href="/logout" className="flex flex-row gap-3 items-center">
-                            {/* <p className={`text-white font-medium`}>Logout</p> */}
+                        <button className="flex flex-row gap-3 items-center"
+                            onClick={handleLogout} >
                             <LogOut className="text-white" />
-                        </Link>
+                        </button>
                     </li>
                 </ul>
 

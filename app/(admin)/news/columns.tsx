@@ -1,17 +1,24 @@
 "use client"
 
+import { logout } from "@/lib"
 import { ColumnDef } from "@tanstack/react-table"
+import axios from "axios"
 import { Eye, Pencil, Trash2 } from "lucide-react"
 import Link from "next/link"
+import { toast } from "sonner"
+import Cookies from 'js-cookie';
 
-export type Payment = {
+export type News = {
   id: string
-  amount: number
-  status: "pending" | "processing" | "success" | "failed"
-  email: string
+  title: string
+  user: {
+    firstname: string
+  }
+  createdAt: string
+  index: number
 }
 
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<News>[] = [
   {
     accessorKey: "index",
     header: () => <div className="w-4">No</div>,
@@ -21,67 +28,85 @@ export const columns: ColumnDef<Payment>[] = [
   },
   {
     accessorKey: "title",
-    header: "Name",
+    header: "Title",
     cell: ({ row }) => {
-      return <div className="">{row.original.amount}</div>
+      return <div className="">{row.original.title}</div>
     }
   },
   {
-    accessorKey: "description",
-    header: "Description",
+    accessorKey: "createdBy",
+    header: "Created by",
     cell: ({ row }) => {
-      return <div className="">{row.original.status}</div>
+      return <div className="">{row.original.user.firstname}</div>
     }
   },
   {
-    accessorKey: "status",
-    header: "Status",
-    filterFn: (row, columnId, value) => {
-      const rowValue = row.getValue(columnId);
-
-      if (value === "all") {
-        return true
-      } else if (value === "active") {
-        return rowValue === 1
-      } else if (value === "inactive") {
-        return rowValue === 0
-      } else {
-        return true
-      }
-    },
+    accessorKey: "createdAt",
+    header: "Created at",
     cell: ({ row }) => {
-      const status = Number(row.original.status)
+      const date = new Date(row.original.createdAt)
+      const formattedDate = date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
 
-      return (
-        <div className="flex flex-row gap-2">
-          <div className={`rounded-[50px] ${status === 1 ? "bg-[#dcf7e3]" : "bg-[#ebebeb]"} px-4 py-2`}>
-            <p className={`${status === 1 ? "text-[#2FA84F]" : "text-gray2"} font-semibold text-[14px]`}>
-              {status === 1 ? "Active" : "Inactive"}
-            </p>
-          </div>
-        </div>
-      )
+      return <div className="">{formattedDate}</div>
     }
   },
   {
     id: "actions",
     cell: ({ row }) => {
-      const id = row.original.id
+      const id = Number(row.original.id)
 
+      const handleDelete = async (id: number) => {
+        if (!confirm("Are you sure you want to delete this data?")) {
+          return null
+        }
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
+        const token = Cookies.get('token');
+
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+        try {
+          axios.delete(`${baseUrl}/api/v1/news/delete/${id}`, config)
+            .then(function () {
+              toast.success('News has been deleted')
+              setTimeout(() => {
+                window.location.reload()
+              }, 1500)
+            })
+            .catch(function (error) {
+              console.log(error);
+            })
+        } catch (error) {
+          if (axios.isAxiosError(error) && error.response?.status == 401) {
+            logout();
+          }
+          console.log(error)
+        }
+      }
       return (
         <div className="flex flex-row gap-2 w-32">
           <Link href={`/news/${id}`}>
             <button className="bg-secondary p-2">
-              <Eye />
+              <Eye className="w-4" />
             </button>
           </Link>
           <Link href={`/news/${id}/edit`}>
             <button className="bg-secondary p-2">
-              <Pencil />
+              <Pencil className="w-4" />
             </button>
           </Link>
-          <button className="bg-secondary p-2">
-            <Trash2 />
+          <button className="bg-secondary p-2"
+            onClick={() => {
+              handleDelete(Number(id))
+            }}
+          >
+            <Trash2 className="w-4 text-red-600" />
           </button>
         </div>
       )

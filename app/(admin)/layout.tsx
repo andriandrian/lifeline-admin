@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Poppins } from 'next/font/google';
 import "../globals.css";
 import SideNav from "@/components/ui/sideNav";
+import { getSession } from "@/lib";
+import { redirect } from "next/navigation";
+import { Toaster } from 'sonner'
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -11,8 +14,8 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Eurasia Admin",
-  description: "Eurasia Admin",
+  title: "Lifeline",
+  description: "Lifeline Admin",
 };
 
 export default async function RootLayout({
@@ -20,6 +23,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getSession();
+
+  if (session === null || session === "") {
+    redirect('/login');
+  }
 
   return (
     <div
@@ -30,6 +38,7 @@ export default async function RootLayout({
       </div>
       <main className="w-full bg-red-50 flex flex-col lg:ml-[280px]">
         {children}
+        <Toaster richColors position="top-right" />
       </main>
     </div>
   );

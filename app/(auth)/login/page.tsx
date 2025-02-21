@@ -32,7 +32,6 @@ const formSchema = z.object({
 })
 
 export default function Page() {
-
     const router = useRouter();
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -63,42 +62,51 @@ export default function Page() {
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         // Check if the user is already logged in
-        const token = Cookies.get('token')
+        // const token = Cookies.get('token')
         // login fron ./lib
 
 
-        if (token) {
-            // If a token exists, redirect to the dashboard
-            router.push('/dashboard');
-            return; // Exit the function early
-        }
-        console.log('values')
+        // if (token) {
+        //     // If a token exists, redirect to the dashboard
+        //     router.push('/dashboard');
+        //     return; // Exit the function early
+        // }
+        // console.log('values')
 
         try {
-            console.log(values);
             const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-            const response = await axios.post(`${baseUrl}/admin/login`, values);
+            const response = await axios.post(`${baseUrl}/api/v1/login`, values);
+            console.log(response, 'response')
             if (response.status == 500) {
                 console.log('error')
                 return;
             }
-            console.log(response.data, 'response');
-            const token = response.data.data.token;
-            // Cookies.set('session', token, { expires: 10 * 1000 });
+            if (response.data.code == 400) {
+                console.log(response)
+                setErrorMessage(response.data.error);
+                return;
+            }
+            // console.log(response.data, 'response');
+            const token = response.data.data.user.accessToken
+            const refreshToken = response.data.data.user.refreshToken
+            console.log(response.status, 'response.code')
 
-            // localStorage.setItem('token', token);
-            Cookies.set('token', token, { expires: 1 });
-            Cookies.set('email', values.email, { expires: 1 });
-            Cookies.set('role', response.data.data.admin.roles_id, { expires: 1 });
-            Cookies.set('name', response.data.data.admin.name, { expires: 1 });
-
-            // Redirect to the admin panel or another page
-            router.push('/dashboard'); // Adjust the path as needed
+            if (response.data.code == 200) {
+                console.log('success')
+                Cookies.set('token', token, { expires: 1 });
+                localStorage.setItem('token', token);
+                Cookies.set('refreshToken', refreshToken, { expires: 1 });
+                Cookies.set('email', values.email, { expires: 1 });
+                Cookies.set('name', response.data.data.user.user.firstname, { expires: 1 });
+                Cookies.set('userId', response.data.data.user.user.id, { expires: 1 });
+                // Cookies.set('role', response.data.data.admin.roles_id, { expires: 1 });
+                router.push('/dashboard'); // Adjust the path as needed
+                return;
+            }
         } catch (error) {
             if (axios.isAxiosError(error) && error.response) {
-                setErrorMessage(error.response.data.message);
-            } else {
-                setErrorMessage("An unexpected error occurred.");
+                console.log(error);
+                setErrorMessage(error.response.data.error);
             }
         }
     }

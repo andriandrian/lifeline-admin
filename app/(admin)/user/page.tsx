@@ -4,31 +4,26 @@ import { useEffect, useState } from "react";
 import { columns } from "./columns"
 import { DataTable } from "./data-table"
 import Navbar from "@/components/ui/navbar";
-import Cookies from 'js-cookie';
-import axios from "axios";
-import { logout } from "@/lib";
+
 export default function Page() {
     const [data, setData] = useState<[]>([]);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const token = Cookies.get('token');
         async function fetchData() {
             try {
                 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-                const config = {
-                    headers: {
-                        'Authorization': 'Bearer ' + token
-                    }
-                }
-                const response = await axios.get(`${baseUrl}/api/v1/donationRequest/list`, config);
+                const response = await fetch(`${baseUrl}/api/v1/hospital?page=1&limit=10`);
 
-                const Data = await response.data;
-                setData(Data.data.donationRequests);
-            } catch (error) {
-                if (axios.isAxiosError(error) && error.response?.status == 401) {
-                    logout();
+                if (!response.ok) {
+                    throw new Error('Failed to fetch');
                 }
+
+                const Data = await response.json();
+                console.log(Data.data.news, 'data');
+                setData(Data.data.news);
+            } catch (error) {
+                console.log(error);
                 setError(error instanceof Error ? error.message : 'An error occurred');
             }
         }
@@ -44,7 +39,7 @@ export default function Page() {
 
     return (
         <div className="h-full md:min-h-screen">
-            <Navbar title="Donation Request" />
+            <Navbar title="User" />
             <div className="py-6 px-8">
                 <div className="w-full bg-white p-6 rounded-[8px]">
                     <DataTable columns={columns} data={data} />

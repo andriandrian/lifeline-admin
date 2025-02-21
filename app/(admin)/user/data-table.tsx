@@ -58,25 +58,24 @@ export function DataTable<TData, TValue>({
             <div className="flex items-center py-4 gap-6">
                 <Input
                     placeholder="Search"
-                    value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+                    value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                        table.getColumn("name")?.setFilterValue(event.target.value)
+                        table.getColumn("title")?.setFilterValue(event.target.value)
                     }
                     className="w-full p-4 h-full"
                 />
                 <div>
                     {/* Filter by active dropdown */}
                     <select
-                        value={(table.getColumn("priority")?.getFilterValue() as string) ?? ""}
+                        value={(table.getColumn("status")?.getFilterValue() as string) ?? ""}
                         onChange={(event) =>
-                            table.getColumn("priority")?.setFilterValue(event.target.value)
+                            table.getColumn("status")?.setFilterValue(event.target.value)
                         }
                         className="border border-gray2 rounded-[4px] p-4 border-opacity-30"
                     >
                         <option value="">All</option>
-                        <option value="low">Low</option>
-                        <option value="mid">Mid</option>
-                        <option value="high">High</option>
+                        <option value="active">Approved</option>
+                        <option value="inactive">New</option>
                     </select>
                 </div>
                 {/* <Link href="/news/add" className="flex flex-row px-6 py-4 rounded-sm items-center bg-primary text-white">
