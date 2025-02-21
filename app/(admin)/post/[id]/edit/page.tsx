@@ -14,6 +14,7 @@ export default function Page() {
     const params = useParams();
     const id = params.id;
     const [priorityModal, setPriorityModal] = useState(false);
+    const [closeModal, setCloseModal] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [formData, setFormData] = useState({
         name: '',
@@ -28,6 +29,8 @@ export default function Page() {
         patientRecordNumber: '',
         createdAt: '',
         verifiedAt: '',
+        closeReason: '',
+        closedAt: ''
     });
 
     useEffect(() => {
@@ -64,7 +67,9 @@ export default function Page() {
                         age: Data.patientAge,
                         patientRecordNumber: Data.patientRecordNumber,
                         createdAt: formattedDate,
-                        verifiedAt: Data.verifiedAt ? Data.verifiedAt : 'Not Verified'
+                        verifiedAt: Data.verifiedAt ? Data.verifiedAt : 'Not Verified',
+                        closedAt: Data.closedAt ? Data.closedAt : 'Not Closed',
+                        closeReason: ''
                     }
                 )
             } catch (error) {
@@ -93,12 +98,45 @@ export default function Page() {
             }
         }
         try {
-            axios.patch(`${baseUrl}/api/v1/donationRequest/verify/${id}`, {
-                priority: formattedPriority
+            axios.patch(`${baseUrl}/api/v1/donationRequest/updateStatus/${id}`, {
+                priority: formattedPriority,
+                type: 'VERIFY'
             }, config)
                 .then(function (response) {
                     console.log(response);
                     toast.success('Priority has been set')
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 1500)
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response?.status == 401) {
+                logout();
+            }
+            setError(error instanceof Error ? error.message : 'An error occurred');
+        }
+    }
+
+    const handleSubmitCloseRequest = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const token = Cookies.get('token');
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+        const config = {
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        }
+        try {
+            axios.patch(`${baseUrl}/api/v1/donationRequest/updateStatus/${id}`, {
+                // reason: 'Donation Request Closed',
+                type: 'CLOSE'
+            }, config)
+                .then(function (response) {
+                    console.log(response);
+                    toast.success('Donation Request has been closed')
                     setTimeout(() => {
                         window.location.reload()
                     }, 1500)
@@ -119,6 +157,10 @@ export default function Page() {
         setPriorityModal(!priorityModal);
     }
 
+    const handleClose = async (e: React.MouseEvent<HTMLButtonElement>) => {
+        e.preventDefault();
+        setCloseModal(!closeModal);
+    }
 
     if (error) {
         return <div className="w-full h-screen flex items-center justify-center text-red-500
@@ -162,6 +204,33 @@ export default function Page() {
                     </div>
                 </div >
             )
+            }
+            {
+                closeModal && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 w-full h-full z-40 flex items-center justify-center">
+                        <div className="bg-white  rounded-[8px] flex flex-col items-center justify-center">
+                            <div className="flex flex-row w-full justify-end p-4">
+                                <button onClick={() => setCloseModal(!closeModal)} className="">
+                                    <X />
+                                </button>
+                            </div>
+                            <form onSubmit={handleSubmitCloseRequest} className="py-6 pb-12 px-12 w-[600px] items-center justify-center">
+                                <h1 className="text-[20px] font-semibold text-black text-center">Close Donation Request</h1>
+                                <textarea name="reason" className="w-full h-[200px] bg-[#F7F7F7] border border-gray2 rounded-[8px] mt-4 px-4 py-2" placeholder="Reason for closing the donation request" required
+                                    value={formData.closeReason}
+                                    onChange={(e) => setFormData({ ...formData, closeReason: e.target.value })}
+                                />
+                                <div className="flex flex-row w-full gap-4 items-center justify-end mt-4">
+                                    <button
+                                        type="submit"
+                                        className="px-8 py-2 text-white bg-primary rounded-[12px] min-w-12">
+                                        Save
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div >
+                )
             }
             <form className="py-6 px-8">
                 <div className="w-full bg-white p-6 rounded-[8px]">
@@ -270,7 +339,15 @@ export default function Page() {
                             >
                                 Verify
                             </button>
-                            : null}
+                            : formData.closedAt === 'Not Closed' ?
+                                <button
+                                    onClick={handleClose}
+                                    className="bg-primary text-white font-semibold text-[16px] py-4 px-14 rounded-[8px] ml-4"
+                                >
+                                    Close Donation Request
+                                </button>
+                                : null
+                    }
                     <Link href="/post">
                         <button className="bg-white border-[1px] border-gray2 text-gray2 font-semibold text-base rounded-[4px] w-[150px] py-4">Back</button>
                     </Link>

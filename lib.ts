@@ -42,7 +42,7 @@ export async function logout() {
   // Destroy the session
   console.log("destroying session");
   (await cookies()).set("token", "", { expires: new Date(0) });
-  (await cookies()).set("refreshToken", "", { expires: new Date(0) });
+  // (await cookies()).set("refreshToken", "", { expires: new Date(0) });
   (await cookies()).set("email", "", { expires: new Date(0) });
   (await cookies()).set("name", "", { expires: new Date(0) });
   (await cookies()).set("userId", "", { expires: new Date(0) });
