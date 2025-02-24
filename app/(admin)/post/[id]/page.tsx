@@ -2,52 +2,65 @@
 
 import { useEffect, useState } from "react";
 import Navbar from "@/components/ui/navbar";
-import Cookies from 'js-cookie';
 import axios from "axios";
 import { logout } from "@/lib";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
+import { axiosInstance } from "@/lib/axios";
 
 export default function Page() {
     const params = useParams();
     const id = params.id;
     const [error, setError] = useState<string | null>(null);
     const [formData, setFormData] = useState({
-        title: "",
-        content: "",
-        imageUrl: "",
-        user: "",
-        createdAt: "",
+        name: '',
+        bloodType: '',
+        description: '',
+        hospital: '',
+        gender: '',
+        reason: '',
+        priority: '',
+        hospitalPhone: '',
+        age: '',
+        patientRecordNumber: '',
+        createdAt: '',
+        verifiedAt: '',
+        closeReason: '',
+        closedAt: ''
     });
 
     useEffect(() => {
-        const token = Cookies.get('token');
         async function fetchData() {
             try {
-                const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-                const config = {
-                    headers: {
-                        'Authorization': 'Bearer ' + token
-                    }
-                }
-                const response = await axios.get(`${baseUrl}/api/v1/news/detail/${id}`, config);
+                const response = await axiosInstance.get(`api/v1/donationRequest/detail/${id}`);
                 console.log(response.data.data, 'response')
 
-                const Data = response.data.data.news;
+                const Data = await response.data.data.donationRequest;
                 const date = new Date(Data.createdAt)
                 const formattedDate = date.toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "long",
                     day: "numeric",
                 })
-                setFormData({
-                    title: Data.title,
-                    content: Data.content,
-                    imageUrl: Data.imageUrl,
-                    user: Data.user.firstname,
-                    createdAt: formattedDate,
-                });
+                const fullname = Data.user.firstname + ' ' + Data.user.lastname;
+                setFormData(
+                    {
+                        name: fullname,
+                        bloodType: Data.bloodType,
+                        description: Data.description,
+                        hospital: Data.hospital.name,
+                        gender: Data.patientGender,
+                        reason: Data.reason,
+                        priority: Data.priority,
+                        hospitalPhone: Data.hospital.phone,
+                        age: Data.patientAge,
+                        patientRecordNumber: Data.patientRecordNumber,
+                        createdAt: formattedDate,
+                        verifiedAt: Data.verifiedAt ? Data.verifiedAt : 'Not Verified',
+                        closedAt: Data.closedAt ? Data.closedAt : 'Not Closed',
+                        closeReason: ''
+                    }
+                )
             } catch (error) {
                 if (axios.isAxiosError(error) && error.response?.status == 401) {
                     logout();
@@ -66,60 +79,107 @@ export default function Page() {
 
     return (
         <div className="h-full min-h-screen">
-            <Navbar title="Donation Request Detail" />
+            <Navbar title="Edit Donation Request" />
             <form className="py-6 px-8">
                 <div className="w-full bg-white p-6 rounded-[8px]">
                     <div className="flex flex-row gap-6">
-                        <div className="w-full">
-                            <div className="flex flex-col gap-4">
-                                <div className="flex flex-row w-full justify-between">
-                                    <label className="block text-[16px] font-semibold text-black">Title</label>
+                        <div className="w-full flex flex-row gap-6">
+                            <div className="w-1/2 flex flex-col gap-6">
+                                <div className="flex flex-col gap-4">
+                                    <div className="flex flex-row w-full justify-between">
+                                        <label className="block text-[16px] font-semibold text-black">Name</label>
+                                    </div>
+                                    <p className="rounded-[4px]">
+                                        {formData.name}
+                                    </p>
                                 </div>
-                                <p className="rounded-[4px] py-1">
-                                    {formData.title}
-                                </p>
+                                <div className="flex flex-col gap-4">
+                                    <div className="flex flex-row w-full justify-between">
+                                        <label className="block text-[16px] font-semibold text-black">Age</label>
+                                    </div>
+                                    <p className="rounded-[4px]">
+                                        {formData.age}
+                                    </p>
+                                </div>
+                                <div className="flex flex-col gap-4">
+                                    <div className="flex flex-row w-full justify-between">
+                                        <label className="block text-[16px] font-semibold text-black">Blood Type</label>
+                                    </div>
+                                    <p className="rounded-[4px]">
+                                        {formData.bloodType}
+                                    </p>
+                                </div>
+                                <div className="flex flex-col gap-4">
+                                    <div className="flex flex-row w-full justify-between">
+                                        <label className="block text-[16px] font-semibold text-black">Gender</label>
+                                    </div>
+                                    <p className="rounded-[4px]">
+                                        {formData.gender}
+                                    </p>
+                                </div>
+                                <div className="flex flex-col gap-4">
+                                    <div className="flex flex-row w-full justify-between">
+                                        <label className="block text-[16px] font-semibold text-black">Record Number</label>
+                                    </div>
+                                    <p className="rounded-[4px]">
+                                        {formData.patientRecordNumber}
+                                    </p>
+                                </div>
                             </div>
-                            <div className="flex flex-col gap-4 mt-6">
-                                <div className="flex flex-row w-full justify-between">
-                                    <label className="block text-[16px] font-semibold text-black">Content</label>
+                            <div className="w-1/2 flex flex-col gap-6">
+                                <div className="flex flex-col gap-4">
+                                    <div className="flex flex-row w-full justify-between">
+                                        <label className="block text-[16px] font-semibold text-black">Priority</label>
+                                    </div>
+                                    <p className="rounded-[4px]">
+                                        {formData.priority == "low" ? "Low" : formData.priority == "medium" ? "Medium" : "High"}
+                                    </p>
                                 </div>
-                                <div className="py-1 whitespace-pre-line">{formData.content}</div>
-                            </div>
-                            <div className="flex flex-col gap-4 mt-6">
-                                <div className="flex flex-row w-full justify-between">
-                                    <label className="block text-[16px] font-semibold text-black">Image</label>
+                                <div className="flex flex-col gap-4">
+                                    <div className="flex flex-row w-full justify-between">
+                                        <label className="block text-[16px] font-semibold text-black">Description</label>
+                                    </div>
+                                    <p className="rounded-[4px]">
+                                        {formData.description}
+                                    </p>
                                 </div>
-                                {formData.imageUrl &&
-                                    <Image className="rounded-[4px] py-1 h-auto max-h-[300px]"
-                                        src={formData.imageUrl}
-                                        alt="Image"
-                                        width={100}
-                                        height={100}
-                                    />
-                                }
-                            </div>
-                            <div className="flex flex-col gap-4 mt-6">
-                                <div className="flex flex-row w-full justify-between">
-                                    <label className="block text-[16px] font-semibold text-black">Created by</label>
+                                <div className="flex flex-col gap-4">
+                                    <div className="flex flex-row w-full justify-between">
+                                        <label className="block text-[16px] font-semibold text-black">Reason</label>
+                                    </div>
+                                    <p className="rounded-[4px]">
+                                        {formData.reason}
+                                    </p>
                                 </div>
-                                <p className="rounded-[4px] py-1">
-                                    {formData.user}
-                                </p>
-                            </div>
-                            <div className="flex flex-col gap-4 mt-6">
-                                <div className="flex flex-row w-full justify-between">
-                                    <label className="block text-[16px] font-semibold text-black">Created at</label>
+                                <div className="flex flex-col gap-4">
+                                    <div className="flex flex-row w-full justify-between">
+                                        <label className="block text-[16px] font-semibold text-black">Hospital</label>
+                                    </div>
+                                    <p className="rounded-[4px]">
+                                        {formData.hospital}
+                                    </p>
                                 </div>
-                                <p className="rounded-[4px] py-1">
-                                    {formData.createdAt}
-                                </p>
+                                <div className="flex flex-col gap-4">
+                                    <div className="flex flex-row w-full justify-between">
+                                        <label className="block text-[16px] font-semibold text-black">Hospital Phone</label>
+                                    </div>
+                                    <p className="rounded-[4px]">
+                                        {formData.hospitalPhone}
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                 </div>
-                <div className="flex flex-row justify-end pt-6">
-                    <Link href="/news">
+                <div className="flex flex-row-reverse pt-6">
+                    {/* <button
+                        type="submit"
+                        className="bg-primary text-white font-semibold text-[16px] py-4 px-14 rounded-[8px] ml-4"
+                    >
+                        Save
+                    </button> */}
+                    <Link href="/post">
                         <button className="bg-white border-[1px] border-gray2 text-gray2 font-semibold text-base rounded-[4px] w-[150px] py-4">Back</button>
                     </Link>
                 </div>

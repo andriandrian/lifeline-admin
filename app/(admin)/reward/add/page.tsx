@@ -13,27 +13,25 @@ export default function Page() {
     const [error, setError] = useState<string | null>(null);
     const [formData, setFormData] = useState({
         name: "",
-        address: "",
-        phone: "",
-        email: "",
-        website: "",
+        description: "",
+        points: 0,
+        stock: 0,
     });
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
         try {
-            const response = axiosInstance.post(`${baseUrl}/api/v1/hospital/create`, {
+            const response = axiosInstance.post(`${baseUrl}/api/v1/reward/create`, {
                 name: formData.name,
-                address: formData.address,
-                phone: formData.phone,
-                email: formData.email,
-                website: formData.website,
+                description: formData.description,
+                points: formData.points,
+                stock: formData.stock,
             })
                 .then(function (response) {
                     console.log(response);
-                    router.push(`/hospital/${response.data.data.hospital.id}`)
-                    toast.success('Hospital has been created')
+                    router.push(`/reward/${response.data.data.reward.id}`)
+                    toast.success('Reward has been created')
                 })
                 .catch(function (error) {
                     console.log(error);
@@ -56,7 +54,7 @@ export default function Page() {
 
     return (
         <div className="h-full min-h-screen">
-            <Navbar title="Add Hospital" />
+            <Navbar title="Add Reward" />
             <form className="py-6 px-8" onSubmit={handleSubmit}>
                 <div className="w-full bg-white p-6 rounded-[8px]">
                     <div className="flex flex-row gap-6">
@@ -72,51 +70,36 @@ export default function Page() {
                             </div>
                             <div className="flex flex-col gap-4 mt-6">
                                 <div className="flex flex-row w-full justify-between">
-                                    <label className="block text-[16px] font-semibold text-black">Address</label>
+                                    <label className="block text-[16px] font-semibold text-black">Description</label>
                                 </div>
                                 <input type="text" className="border border-gray2 rounded-[4px] p-4"
-                                    value={formData.address}
-                                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                                    value={formData.description}
+                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 />
                             </div>
                             <div className="flex flex-col gap-4 mt-6">
                                 <div className="flex flex-row w-full justify-between">
-                                    <label className="block text-[16px] font-semibold text-black">Phone</label>
+                                    <label className="block text-[16px] font-semibold text-black">Stock</label>
                                 </div>
-                                <input type="text" className="border border-gray2 rounded-[4px] p-4"
-                                    value={formData.phone}
-                                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                <input
+                                    className="border border-gray2 rounded-[4px] p-4"
+                                    type="number"
+                                    value={formData.stock}
+                                    onChange={(e) => setFormData({ ...formData, stock: Number(e.target.value) })}
                                 />
                             </div>
                             <div className="flex flex-col gap-4 mt-6">
                                 <div className="flex flex-row w-full justify-between">
-                                    <label className="block text-[16px] font-semibold text-black">Email</label>
+                                    <label className="block text-[16px] font-semibold text-black">points</label>
                                 </div>
-                                <input type="text" className="border border-gray2 rounded-[4px] p-4"
-                                    value={formData.email}
-                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                />
-                            </div>
-                            <div className="flex flex-col gap-4 mt-6">
-                                <div className="flex flex-row w-full justify-between">
-                                    <label className="block text-[16px] font-semibold text-black">Website</label>
-                                </div>
-                                <input type="text" className="border border-gray2 rounded-[4px] p-4"
-                                    value={formData.website}
-                                    onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                                <input
+                                    className="border border-gray2 rounded-[4px] p-4"
+                                    type="number"
+                                    value={formData.points}
+                                    onChange={(e) => setFormData({ ...formData, points: Number(e.target.value) })}
                                 />
                             </div>
                         </div>
-                        {/* <div className="w-1/2">
-                            <div className="flex flex-col gap-4">
-                                <label className="text-[14px] text-gray2">Alt Image</label>
-                                <input type="text" className="border border-gray2 rounded-[4px] p-2" />
-                            </div>
-                            <div className="flex flex-col gap-4">
-                                <label className="text-[14px] text-gray2">Link</label>
-                                <input type="text" className="border border-gray2 rounded-[4px] p-2" />
-                            </div>
-                        </div> */}
                     </div>
 
 

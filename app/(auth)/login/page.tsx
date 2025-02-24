@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input"
 import { useRouter } from "next/navigation"
 import axios from "axios"
 import { useState } from "react"
+import { axiosInstance } from "@/lib/axios"
 
 const formSchema = z.object({
     email: z.string().min(2, {
@@ -75,7 +76,7 @@ export default function Page() {
 
         try {
             const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-            const response = await axios.post(`${baseUrl}/api/v1/login`, values);
+            const response = await axiosInstance.post(`${baseUrl}/api/v1/login`, values);
             console.log(response, 'response')
             if (response.status == 500) {
                 console.log('error')
@@ -86,21 +87,13 @@ export default function Page() {
                 setErrorMessage(response.data.error);
                 return;
             }
-            // console.log(response.data, 'response');
-            const token = response.data.data.user.accessToken
-            const refreshToken = response.data.data.user.refreshToken
             console.log(response.status, 'response.code')
 
             if (response.data.code == 200) {
-                console.log('success')
-                Cookies.set('token', token, { expires: 1 });
-                localStorage.setItem('token', token);
-                Cookies.set('refreshToken', refreshToken, { expires: 1 });
-                Cookies.set('email', values.email, { expires: 1 });
                 Cookies.set('name', response.data.data.user.user.firstname, { expires: 1 });
-                Cookies.set('userId', response.data.data.user.user.id, { expires: 1 });
-                // Cookies.set('role', response.data.data.admin.roles_id, { expires: 1 });
-                router.push('/dashboard'); // Adjust the path as needed
+                localStorage.setItem('name', response.data.data.user.user.firstname);
+                localStorage.setItem('userId', response.data.data.user.user.id);
+                router.push('/dashboard');
                 return;
             }
         } catch (error) {

@@ -5,32 +5,17 @@ import { columns } from "./columns"
 import { DataTable } from "./data-table"
 import Navbar from "@/components/ui/navbar";
 import axios from "axios";
-import Cookies from 'js-cookie';
 import { logout } from "@/lib";
+import { axiosInstance } from "@/lib/axios";
 
 export default function Page() {
     const [data, setData] = useState<[]>([]);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const token = Cookies.get('token');
         async function fetchData() {
             try {
-                const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-                const config = {
-                    headers: {
-                        'Authorization': 'Bearer ' + token
-                    }
-                }
-                const response = await axios.get(`${baseUrl}/api/v1/hospital/list`, config);
-                if (response.status == 401) {
-                    console.log('error')
-                    logout();
-                }
-
-                // if (!response.ok) {
-                //     throw new Error('Failed to fetch');
-                // }
+                const response = await axiosInstance.get('/api/v1/hospital/list');
 
                 const Data = response.data;
                 setData(Data.data.hospitals);

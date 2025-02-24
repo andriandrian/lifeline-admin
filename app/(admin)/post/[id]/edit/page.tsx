@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 import Navbar from "@/components/ui/navbar";
-import Cookies from 'js-cookie';
 import axios from "axios";
 import { logout } from "@/lib";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
 import { X } from "lucide-react";
+import { axiosInstance } from "@/lib/axios";
 
 export default function Page() {
     const params = useParams();
@@ -34,16 +34,9 @@ export default function Page() {
     });
 
     useEffect(() => {
-        const token = Cookies.get('token');
         async function fetchData() {
             try {
-                const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-                const config = {
-                    headers: {
-                        'Authorization': 'Bearer ' + token
-                    }
-                }
-                const response = await axios.get(`${baseUrl}/api/v1/donationRequest/detail/${id}`, config);
+                const response = await axiosInstance.get(`api/v1/donationRequest/detail/${id}`);
                 console.log(response.data.data, 'response')
 
                 const Data = await response.data.data.donationRequest;
@@ -86,22 +79,13 @@ export default function Page() {
     const handleSetPriority = async (e: React.MouseEvent<HTMLButtonElement>) => {
         // e.preventDefault();
         console.log(e.currentTarget.textContent, 'priority')
-        const token = Cookies.get('token');
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
         const formattedPriority = e.currentTarget.textContent?.toLowerCase();
-
-
-        const config = {
-            headers: {
-                'Authorization': 'Bearer ' + token
-            }
-        }
         try {
-            axios.patch(`${baseUrl}/api/v1/donationRequest/updateStatus/${id}`, {
+            axiosInstance.patch(`/api/v1/donationRequest/updateStatus/${id}`, {
                 priority: formattedPriority,
                 type: 'VERIFY'
-            }, config)
+            })
                 .then(function (response) {
                     console.log(response);
                     toast.success('Priority has been set')
@@ -122,18 +106,11 @@ export default function Page() {
 
     const handleSubmitCloseRequest = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const token = Cookies.get('token');
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-        const config = {
-            headers: {
-                'Authorization': 'Bearer ' + token
-            }
-        }
         try {
-            axios.patch(`${baseUrl}/api/v1/donationRequest/updateStatus/${id}`, {
+            axiosInstance.patch(`/api/v1/donationRequest/updateStatus/${id}`, {
                 // reason: 'Donation Request Closed',
                 type: 'CLOSE'
-            }, config)
+            })
                 .then(function (response) {
                     console.log(response);
                     toast.success('Donation Request has been closed')

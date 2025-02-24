@@ -3,13 +3,12 @@
 import { useEffect, useState } from "react";
 import Navbar from "@/components/ui/navbar";
 import axios from "axios";
-import { Plus } from "lucide-react";
-import { logout } from "@/lib";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { axiosInstance } from "@/lib/axios";
 import { toast } from "sonner";
+import { Plus } from "lucide-react";
 
 export default function Page() {
     const params = useParams();
@@ -19,13 +18,16 @@ export default function Page() {
     const [error, setError] = useState<string | null>(null);
     const [formData, setFormData] = useState({
         title: "",
-        content: "",
+        description: "",
+        location: "",
         image: "",
         imageUrl: "",
         imageUrlFormatted: "",
         user: "",
         userId: "",
         createdAt: "",
+        startDate: "",
+        endDate: "",
     });
 
     const onChangePicture = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,34 +48,42 @@ export default function Page() {
         async function fetchData() {
             try {
                 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-                const response = await axiosInstance.get(`${baseUrl}/api/v1/news/detail/${id}`);
+                const response = await axiosInstance.get(`${baseUrl}/api/v1/event/detail/${id}`);
                 console.log(response.data.data, 'response')
 
-                const Data = await response.data.data.news;
-                const date = new Date(Data.createdAt)
-                const formattedDate = date.toLocaleDateString("en-US", {
+                const Data = await response.data.data.event;
+                const createdDate = new Date(Data.createdAt)
+                const formattedDate = createdDate.toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "long",
                     day: "numeric",
                 })
+                const startDate = new Date(Data.startDate)
+                const formattedStartDate = startDate.toISOString().split('T')[0];
+                const endDate = new Date(Data.endDate)
+                const formattedEndDate = endDate.toISOString().split('T')[0];
                 const imageUrlFormatted = `${baseUrl}${Data.imageUrl}`;
                 setFormData(
                     {
                         title: Data.title,
-                        content: Data.content,
+                        description: Data.description,
+                        location: Data.location,
                         image: '',
                         imageUrl: Data.imageUrl,
                         imageUrlFormatted: imageUrlFormatted,
                         user: Data.user.firstname,
                         userId: Data.user.id,
                         createdAt: formattedDate,
+                        startDate: formattedStartDate,
+                        endDate: formattedEndDate,
                     }
                 )
             } catch (error) {
-                if (axios.isAxiosError(error) && error.response?.status == 401) {
-                    logout();
+                if (axios.isAxiosError(error) && error.response) {
+                    setError(error.response.data.error);
+                } else {
+                    setError('An error occurred');
                 }
-                setError(error instanceof Error ? error.message : 'An error occurred');
             }
         }
 
@@ -87,19 +97,22 @@ export default function Page() {
         try {
             const formDataToSend = new FormData();
             formDataToSend.append('title', formData.title);
-            formDataToSend.append('content', formData.content);
+            formDataToSend.append('description', formData.description);
             formDataToSend.append('userId', formData.userId);
+            formDataToSend.append('startDate', formData.startDate);
+            formDataToSend.append('endDate', formData.endDate);
+            formDataToSend.append('location', formData.location);
             if (picture) {
                 formDataToSend.append('image', picture);
             }
 
-            axiosInstance.put(`${baseUrl}/api/v1/news/update/${id}`, formDataToSend, {
+            axiosInstance.put(`${baseUrl}/api/v1/event/update/${id}`, formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             })
                 .then(function (response) {
-                    toast.success('News updated successfully');
+                    toast.success('Event updated successfully');
                     console.log(response);
                 })
                 .catch(function (error) {
@@ -122,7 +135,7 @@ export default function Page() {
 
     return (
         <div className="h-full min-h-screen">
-            <Navbar title="Edit News" />
+            <Navbar title="Edit Event" />
             <form className="py-6 px-8" onSubmit={handleSubmit}>
                 <div className="w-full bg-white p-6 rounded-[8px]">
                     <div className="flex flex-row gap-6">
@@ -138,11 +151,20 @@ export default function Page() {
                             </div>
                             <div className="flex flex-col gap-4 mt-6">
                                 <div className="flex flex-row w-full justify-between">
-                                    <label className="block text-[16px] font-semibold text-black">Content</label>
+                                    <label className="block text-[16px] font-semibold text-black">Description</label>
                                 </div>
                                 <textarea name="description" className="p-4 min-h-[150px] border border-gray2 rounded-[4px]"
-                                    value={formData.content}
-                                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                                    value={formData.description}
+                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                />
+                            </div>
+                            <div className="flex flex-col gap-4 mt-6">
+                                <div className="flex flex-row w-full justify-between">
+                                    <label className="block text-[16px] font-semibold text-black">Location</label>
+                                </div>
+                                <input type="text" className="border border-gray2 rounded-[4px] p-4"
+                                    value={formData.location}
+                                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                                 />
                             </div>
                             <div className="flex flex-col gap-4 mt-6">
@@ -180,7 +202,7 @@ export default function Page() {
                                     <Image src={formData.imageUrlFormatted} alt="Preview" width={200} height={200} />
                                 }
                             </div>
-                            <div className="flex flex-col gap-4 mt-6">
+                            {/* <div className="flex flex-col gap-4 mt-6">
                                 <div className="flex flex-row w-full justify-between">
                                     <label className="block text-[16px] font-semibold text-black">Created by</label>
                                 </div>
@@ -188,7 +210,26 @@ export default function Page() {
                                     value={formData.user}
                                     readOnly
                                 />
+                            </div> */}
+                            <div className="flex flex-col gap-4 mt-6">
+                                <div className="flex flex-row w-full justify-between">
+                                    <label className="block text-[16px] font-semibold text-black">Start Date</label>
+                                </div>
+                                <input type="date" className="border border-gray2 rounded-[4px] p-4 w-fit"
+                                    value={formData.startDate}
+                                    onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                                />
                             </div>
+                            <div className="flex flex-col gap-4 mt-6">
+                                <div className="flex flex-row w-full justify-between">
+                                    <label className="block text-[16px] font-semibold text-black">End Date</label>
+                                </div>
+                                <input type="date" className="border border-gray2 rounded-[4px] p-4 w-fit"
+                                    value={formData.endDate}
+                                    onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                                />
+                            </div>
+
                             <div className="flex flex-col gap-4 mt-6">
                                 <div className="flex flex-row w-full justify-between">
                                     <label className="block text-[16px] font-semibold text-black">Created at</label>

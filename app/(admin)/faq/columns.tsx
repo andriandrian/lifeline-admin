@@ -10,9 +10,7 @@ import { axiosInstance } from "@/lib/axios"
 
 export type Hospital = {
   id: number
-  name: string
-  phone: string
-  address: string
+  question: string
   index: number
 }
 
@@ -25,24 +23,10 @@ export const columns: ColumnDef<Hospital>[] = [
     },
   },
   {
-    accessorKey: "name",
-    header: "Name",
+    accessorKey: "question",
+    header: "Question",
     cell: ({ row }) => {
-      return <div className="">{row.original.name}</div>
-    }
-  },
-  {
-    accessorKey: "phone",
-    header: "Phone",
-    cell: ({ row }) => {
-      return <div className="">{row.original.phone}</div>
-    }
-  },
-  {
-    accessorKey: "address",
-    header: "Address",
-    cell: ({ row }) => {
-      return <div className="">{row.original.address}</div>
+      return <div className="">{row.original.question}</div>
     }
   },
   {
@@ -56,9 +40,9 @@ export const columns: ColumnDef<Hospital>[] = [
         }
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
         try {
-          axiosInstance.delete(`${baseUrl}/api/v1/hospital/delete/${id}`)
+          axiosInstance.delete(`${baseUrl}/api/v1/faq/delete/${id}`)
             .then(function () {
-              toast.success('Hospital has been deleted')
+              toast.success('FAQ has been deleted')
               setTimeout(() => {
                 window.location.reload()
               }, 1500)
@@ -74,24 +58,26 @@ export const columns: ColumnDef<Hospital>[] = [
         }
       }
       return (
-        <div className="flex flex-row gap-2 w-32">
-          <Link href={`/hospital/${id}`}>
-            <button className="bg-secondary p-2">
-              <Eye className="w-4" />
+        <div className="w-8">
+          <div className="flex flex-row gap-2 w-32">
+            <Link href={`/faq/${id}`}>
+              <button className="bg-secondary p-2">
+                <Eye className="w-4" />
+              </button>
+            </Link>
+            <Link href={`/faq/${id}/edit`}>
+              <button className="bg-secondary p-2">
+                <Pencil className="w-4" />
+              </button>
+            </Link>
+            <button className="bg-secondary p-2"
+              onClick={() => {
+                handleDelete(Number(id))
+              }}
+            >
+              <Trash2 className="w-4 text-red-600" />
             </button>
-          </Link>
-          <Link href={`/hospital/${id}/edit`}>
-            <button className="bg-secondary p-2">
-              <Pencil className="w-4" />
-            </button>
-          </Link>
-          <button className="bg-secondary p-2"
-            onClick={() => {
-              handleDelete(Number(id))
-            }}
-          >
-            <Trash2 className="w-4 text-red-600" />
-          </button>
+          </div>
         </div>
       )
     },

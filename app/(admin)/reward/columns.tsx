@@ -8,17 +8,15 @@ import Link from "next/link"
 import { toast } from "sonner"
 import { axiosInstance } from "@/lib/axios"
 
-export type News = {
-  id: string
-  title: string
-  user: {
-    firstname: string
-  }
-  createdAt: string
+export type Hospital = {
+  id: number
+  name: string
+  points: number
+  stock: number
   index: number
 }
 
-export const columns: ColumnDef<News>[] = [
+export const columns: ColumnDef<Hospital>[] = [
   {
     accessorKey: "index",
     header: () => <div className="w-4">No</div>,
@@ -27,31 +25,24 @@ export const columns: ColumnDef<News>[] = [
     },
   },
   {
-    accessorKey: "title",
-    header: "Title",
+    accessorKey: "name",
+    header: "Name",
     cell: ({ row }) => {
-      return <div className="">{row.original.title}</div>
+      return <div className="">{row.original.name}</div>
     }
   },
   {
-    accessorKey: "createdBy",
-    header: "Created by",
+    accessorKey: "points",
+    header: "Points",
     cell: ({ row }) => {
-      return <div className="">{row.original.user.firstname}</div>
+      return <div className="">{row.original.points}</div>
     }
   },
   {
-    accessorKey: "createdAt",
-    header: "Created at",
+    accessorKey: "stock",
+    header: "Stock",
     cell: ({ row }) => {
-      const date = new Date(row.original.createdAt)
-      const formattedDate = date.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      })
-
-      return <div className="">{formattedDate}</div>
+      return <div className="">{row.original.stock}</div>
     }
   },
   {
@@ -65,9 +56,9 @@ export const columns: ColumnDef<News>[] = [
         }
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
         try {
-          axiosInstance.delete(`${baseUrl}/api/v1/news/delete/${id}`)
+          axiosInstance.delete(`${baseUrl}/api/v1/reward/delete/${id}`)
             .then(function () {
-              toast.success('News has been deleted')
+              toast.success('Reward has been deleted')
               setTimeout(() => {
                 window.location.reload()
               }, 1500)
@@ -83,24 +74,26 @@ export const columns: ColumnDef<News>[] = [
         }
       }
       return (
-        <div className="flex flex-row gap-2 w-32">
-          <Link href={`/news/${id}`}>
-            <button className="bg-secondary p-2">
-              <Eye className="w-4" />
+        <div className="w-8">
+          <div className="flex flex-row gap-2 w-32">
+            <Link href={`/reward/${id}`}>
+              <button className="bg-secondary p-2">
+                <Eye className="w-4" />
+              </button>
+            </Link>
+            <Link href={`/reward/${id}/edit`}>
+              <button className="bg-secondary p-2">
+                <Pencil className="w-4" />
+              </button>
+            </Link>
+            <button className="bg-secondary p-2"
+              onClick={() => {
+                handleDelete(Number(id))
+              }}
+            >
+              <Trash2 className="w-4 text-red-600" />
             </button>
-          </Link>
-          <Link href={`/news/${id}/edit`}>
-            <button className="bg-secondary p-2">
-              <Pencil className="w-4" />
-            </button>
-          </Link>
-          <button className="bg-secondary p-2"
-            onClick={() => {
-              handleDelete(Number(id))
-            }}
-          >
-            <Trash2 className="w-4 text-red-600" />
-          </button>
+          </div>
         </div>
       )
     },

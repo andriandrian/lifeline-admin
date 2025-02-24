@@ -4,27 +4,22 @@ import { useEffect, useState } from "react";
 import { columns } from "./columns"
 import { DataTable } from "./data-table"
 import Navbar from "@/components/ui/navbar";
-import Cookies from 'js-cookie';
 import axios from "axios";
 import { logout } from "@/lib";
+import { axiosInstance } from "@/lib/axios";
+
 export default function Page() {
     const [data, setData] = useState<[]>([]);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const token = Cookies.get('token');
         async function fetchData() {
             try {
-                const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-                const config = {
-                    headers: {
-                        'Authorization': 'Bearer ' + token
-                    }
-                }
-                const response = await axios.get(`${baseUrl}/api/v1/donationRequest/list`, config);
+                const response = await axiosInstance.get('/api/v1/donationRequest/list');
 
-                const Data = await response.data;
-                setData(Data.data.donationRequests);
+                const Data = await response.data.data.donationRequests;
+                console.log(response.data.data.donationRequests)
+                setData(Data);
             } catch (error) {
                 if (axios.isAxiosError(error) && error.response?.status == 401) {
                     logout();

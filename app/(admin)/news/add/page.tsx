@@ -9,6 +9,7 @@ import axios from "axios";
 import { logout } from "@/lib";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { axiosInstance } from "@/lib/axios";
 
 export default function Page() {
     const router = useRouter();
@@ -39,23 +40,25 @@ export default function Page() {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const token = Cookies.get('token');
+        if (formData.image == "") {
+            return toast.error("Image is required");
+        }
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
         const userId = Cookies.get('userId');
-
-        const config = {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-                'Authorization': 'Bearer ' + token
-            }
-        }
         try {
-            axios.post(`${baseUrl}/api/v1/news/create`, {
-                title: formData.title,
-                content: formData.content,
-                image: picture,
-                userId: userId,
-            }, config)
+            const formDataToSend = new FormData();
+            formDataToSend.append('title', formData.title);
+            formDataToSend.append('content', formData.content);
+            if (picture) {
+                formDataToSend.append('image', picture);
+            }
+            formDataToSend.append('userId', userId || '');
+
+            axiosInstance.post(`${baseUrl}/api/v1/news/create`, formDataToSend, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            })
                 .then(function (response) {
                     console.log(response);
                     toast.success('News has been created')
@@ -130,7 +133,7 @@ export default function Page() {
                                 {/* <input type="file" className="border border-primary bg-transparent text-primary rounded-[4px] p-2 w-fit" onChange={onChangePicture} /> */}
                                 {imgData && <div>
                                     {typeof imgData === 'string' && (
-                                        <Image className="max-h-[200px] min-h-[200px] w-auto" src={imgData} alt="Preview" width={374.19} height={200} />
+                                        <Image className="max-h-[200px] min-h-[200px] w-auto" src={imgData} alt="Preview" width={200} height={200} />
                                     )}
                                 </div>
                                 }

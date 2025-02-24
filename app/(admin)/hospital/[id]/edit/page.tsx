@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Navbar from "@/components/ui/navbar";
-import Cookies from 'js-cookie';
 import axios from "axios";
 import { logout } from "@/lib";
 import { useParams } from "next/navigation";
+import { axiosInstance } from "@/lib/axios";
+import { toast } from "sonner";
 
 export default function Page() {
     const params = useParams();
@@ -20,16 +21,9 @@ export default function Page() {
     });
 
     useEffect(() => {
-        const token = Cookies.get('token');
         async function fetchData() {
             try {
-                const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-                const config = {
-                    headers: {
-                        'Authorization': 'Bearer ' + token
-                    }
-                }
-                const response = await axios.get(`${baseUrl}/api/v1/hospital/detail/${id}`, config);
+                const response = await axiosInstance.get(`/api/v1/hospital/detail/${id}`);
                 console.log(response, 'response')
 
                 const Data = await response.data;
@@ -56,23 +50,16 @@ export default function Page() {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const token = Cookies.get('token');
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-
-        const config = {
-            headers: {
-                'Authorization': 'Bearer ' + token
-            }
-        }
         try {
-            axios.put(`${baseUrl}/api/v1/hospital/create`, {
+            axiosInstance.put(`/api/v1/hospital/update/${id}`, {
                 name: formData.name,
                 address: formData.address,
                 phone: formData.phone,
                 email: formData.email,
                 website: formData.website,
-            }, config)
+            })
                 .then(function (response) {
+                    toast.success('Hospital has been updated')
                     console.log(response);
                 })
                 .catch(function (error) {

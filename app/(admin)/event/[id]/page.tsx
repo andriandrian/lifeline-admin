@@ -14,23 +14,37 @@ export default function Page() {
     const [error, setError] = useState<string | null>(null);
     const [formData, setFormData] = useState({
         title: "",
-        content: "",
+        description: "",
         imageUrl: "",
         imageUrlFormatted: "",
         user: "",
         createdAt: "",
+        startDate: "",
+        endDate: "",
     });
 
     useEffect(() => {
         async function fetchData() {
             try {
                 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-                const response = await axiosInstance.get(`${baseUrl}/api/v1/news/detail/${id}`);
+                const response = await axiosInstance.get(`${baseUrl}/api/v1/event/detail/${id}`);
                 console.log(response.data.data, 'response')
 
-                const Data = response.data.data.news;
-                const date = new Date(Data.createdAt)
-                const formattedDate = date.toLocaleDateString("en-US", {
+                const Data = response.data.data.event;
+                const createdAt = new Date(Data.createdAt)
+                const formattedDate = createdAt.toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                })
+                const startDate = new Date(Data.startDate)
+                const formatttedStartDate = startDate.toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                })
+                const endDate = new Date(Data.endDate)
+                const formatttedEndDate = endDate.toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "long",
                     day: "numeric",
@@ -38,10 +52,12 @@ export default function Page() {
                 const imageUrlFormatted = `${baseUrl}${Data.imageUrl}`;
                 setFormData({
                     title: Data.title,
-                    content: Data.content,
+                    description: Data.description,
                     imageUrl: Data.imageUrl,
                     imageUrlFormatted: imageUrlFormatted,
                     user: Data.user.firstname,
+                    startDate: formatttedStartDate,
+                    endDate: formatttedEndDate,
                     createdAt: formattedDate,
                 });
             } catch (error) {
@@ -63,7 +79,7 @@ export default function Page() {
 
     return (
         <div className="h-full min-h-screen">
-            <Navbar title="News Detail" />
+            <Navbar title="Event Detail" />
             <form className="py-6 px-8">
                 <div className="w-full bg-white p-6 rounded-[8px]">
                     <div className="flex flex-row gap-6">
@@ -78,9 +94,9 @@ export default function Page() {
                             </div>
                             <div className="flex flex-col gap-4 mt-6">
                                 <div className="flex flex-row w-full justify-between">
-                                    <label className="block text-[16px] font-semibold text-black">Content</label>
+                                    <label className="block text-[16px] font-semibold text-black">Description</label>
                                 </div>
-                                <div className="py-1 whitespace-pre-line">{formData.content}</div>
+                                <div className="py-1 whitespace-pre-line">{formData.description}</div>
                             </div>
                             <div className="flex flex-col gap-4 mt-6">
                                 <div className="flex flex-row w-full justify-between">
@@ -101,6 +117,22 @@ export default function Page() {
                                 </div>
                                 <p className="rounded-[4px] py-1">
                                     {formData.user}
+                                </p>
+                            </div>
+                            <div className="flex flex-col gap-4 mt-6">
+                                <div className="flex flex-row w-full justify-between">
+                                    <label className="block text-[16px] font-semibold text-black">Start date</label>
+                                </div>
+                                <p className="rounded-[4px] py-1">
+                                    {formData.startDate}
+                                </p>
+                            </div>
+                            <div className="flex flex-col gap-4 mt-6">
+                                <div className="flex flex-row w-full justify-between">
+                                    <label className="block text-[16px] font-semibold text-black">End date</label>
+                                </div>
+                                <p className="rounded-[4px] py-1">
+                                    {formData.endDate}
                                 </p>
                             </div>
                             <div className="flex flex-col gap-4 mt-6">

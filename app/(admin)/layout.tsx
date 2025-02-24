@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { Poppins } from 'next/font/google';
 import "../globals.css";
 import SideNav from "@/components/ui/sideNav";
-import { getSession } from "@/lib";
-import { redirect } from "next/navigation";
 import { Toaster } from 'sonner'
 
 const poppins = Poppins({
@@ -23,11 +21,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getSession();
+  // const session = await getSession();
 
-  if (session === null || session === "") {
-    redirect('/login');
-  }
+  // if (session === null || session === "") {
+  //   redirect('/login');
+  // }
 
   return (
     <div

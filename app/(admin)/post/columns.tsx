@@ -6,12 +6,13 @@ import axios from "axios"
 import { Eye, Pencil, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
-import Cookies from 'js-cookie';
+import { axiosInstance } from "@/lib/axios"
 
 export type Post = {
   id: number
   user: {
     firstname: string
+    lastname: string
   }
   reason: string
   priority: string
@@ -32,8 +33,17 @@ export const columns: ColumnDef<Post>[] = [
   {
     accessorKey: "name",
     header: "Name",
+    filterFn: (row, columnId, value) => {
+      const firstname = row.original.user.firstname.toLowerCase();
+      const lastname = row.original.user.lastname.toLowerCase();
+      const fullname = `${firstname} ${lastname}`;
+      return fullname.includes(value.toLowerCase());
+    },
     cell: ({ row }) => {
-      return <div className="">{row.original.user.firstname}</div>
+      const firstname = row.original.user.firstname;
+      const lastname = row.original.user.lastname;
+      const fullname = firstname + ' ' + lastname;
+      return <div className="">{fullname}</div>;
     }
   },
   {
@@ -103,15 +113,8 @@ export const columns: ColumnDef<Post>[] = [
           return null
         }
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
-        const token = Cookies.get('token');
-
-        const config = {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
         try {
-          axios.delete(`${baseUrl}/api/v1/donationRequest/delete/${id}`, config)
+          axiosInstance.delete(`${baseUrl}/api/v1/donationRequest/delete/${id}`)
             .then(function () {
               toast.success('Post has been deleted')
               setTimeout(() => {

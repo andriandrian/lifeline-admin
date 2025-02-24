@@ -14,7 +14,9 @@ export type News = {
   user: {
     firstname: string
   }
-  createdAt: string
+  location: string
+  startDate: string
+  endDate: string
   index: number
 }
 
@@ -34,6 +36,13 @@ export const columns: ColumnDef<News>[] = [
     }
   },
   {
+    accessorKey: "location",
+    header: "Location",
+    cell: ({ row }) => {
+      return <div className="">{row.original.location}</div>
+    }
+  },
+  {
     accessorKey: "createdBy",
     header: "Created by",
     cell: ({ row }) => {
@@ -41,10 +50,24 @@ export const columns: ColumnDef<News>[] = [
     }
   },
   {
-    accessorKey: "createdAt",
-    header: "Created at",
+    accessorKey: "startDate",
+    header: "Start Date",
     cell: ({ row }) => {
-      const date = new Date(row.original.createdAt)
+      const date = new Date(row.original.startDate)
+      const formattedDate = date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+
+      return <div className="">{formattedDate}</div>
+    }
+  },
+  {
+    accessorKey: "endDate",
+    header: "End Date",
+    cell: ({ row }) => {
+      const date = new Date(row.original.endDate)
       const formattedDate = date.toLocaleDateString("en-US", {
         year: "numeric",
         month: "long",
@@ -65,9 +88,9 @@ export const columns: ColumnDef<News>[] = [
         }
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
         try {
-          axiosInstance.delete(`${baseUrl}/api/v1/news/delete/${id}`)
+          axiosInstance.delete(`${baseUrl}/api/v1/event/delete/${id}`)
             .then(function () {
-              toast.success('News has been deleted')
+              toast.success('Event has been deleted')
               setTimeout(() => {
                 window.location.reload()
               }, 1500)
@@ -84,12 +107,12 @@ export const columns: ColumnDef<News>[] = [
       }
       return (
         <div className="flex flex-row gap-2 w-32">
-          <Link href={`/news/${id}`}>
+          <Link href={`/event/${id}`}>
             <button className="bg-secondary p-2">
               <Eye className="w-4" />
             </button>
           </Link>
-          <Link href={`/news/${id}/edit`}>
+          <Link href={`/event/${id}/edit`}>
             <button className="bg-secondary p-2">
               <Pencil className="w-4" />
             </button>

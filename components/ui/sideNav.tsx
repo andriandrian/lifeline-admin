@@ -4,7 +4,7 @@ import Image from "next/image";
 import Logo from "@/public/logo.svg";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { CircleUserRound, Hospital, Inbox, LayoutDashboard, LogOut, Newspaper, UserRound } from "lucide-react";
+import { CalendarFold, CircleUserRound, Gift, Hospital, Inbox, LayoutDashboard, LogOut, MessageCircleQuestion, Newspaper, UserRound } from "lucide-react";
 import Cookies from 'js-cookie';
 import { useEffect, useState } from "react";
 
@@ -27,7 +27,6 @@ export default function SideNav() {
     async function handleLogout() {
         if (confirm("Are you sure you want to logout?")) {
             try {
-                // logout();
                 Cookies.set('token', '', { expires: new Date(0) });
                 Cookies.remove('role');
                 Cookies.remove('name');
@@ -56,7 +55,7 @@ export default function SideNav() {
                     <li className={`px-5 py-3 rounded-[4px] min-w-[232px] ${pathname.startsWith("/post") ? "bg-white bg-opacity-20 text-black" : "bg-transparent"}`}>
                         <Link href="/post" className="flex flex-row gap-3 items-center">
                             <Inbox className="text-white" />
-                            <p className={`text-white font-medium`}>Donation Request</p>
+                            <p className={`text-white font-medium`}>Donation</p>
                         </Link>
                     </li>
 
@@ -67,10 +66,31 @@ export default function SideNav() {
                         </Link>
                     </li>
 
+                    <li className={`px-5 py-3 rounded-[4px] min-w-[232px] ${pathname.startsWith("/event") ? "bg-white bg-opacity-20 text-black" : "bg-transparent"}`}>
+                        <Link href="/event" className="flex flex-row gap-3 items-center">
+                            <CalendarFold className="text-white" />
+                            <p className={`text-white font-medium`}>Event</p>
+                        </Link>
+                    </li>
+
                     <li className={`px-5 py-3 rounded-[4px] min-w-[232px] ${pathname.startsWith("/hospital") ? "bg-white bg-opacity-20 text-black" : "bg-transparent"}`}>
                         <Link href="/hospital" className="flex flex-row gap-3 items-center">
                             <Hospital className="text-white" />
                             <p className={`text-white font-medium`}>Hospital</p>
+                        </Link>
+                    </li>
+
+                    <li className={`px-5 py-3 rounded-[4px] min-w-[232px] ${pathname.startsWith("/reward") ? "bg-white bg-opacity-20 text-black" : "bg-transparent"}`}>
+                        <Link href="/reward" className="flex flex-row gap-3 items-center">
+                            <Gift className="text-white" />
+                            <p className={`text-white font-medium`}>Reward</p>
+                        </Link>
+                    </li>
+
+                    <li className={`px-5 py-3 rounded-[4px] min-w-[232px] ${pathname.startsWith("/faq") ? "bg-white bg-opacity-20 text-black" : "bg-transparent"}`}>
+                        <Link href="/faq" className="flex flex-row gap-3 items-center">
+                            <MessageCircleQuestion className="text-white" />
+                            <p className={`text-white font-medium`}>FAQ</p>
                         </Link>
                     </li>
 
@@ -80,6 +100,7 @@ export default function SideNav() {
                             <p className={`text-white font-medium`}>User</p>
                         </Link>
                     </li>
+
                 </ul>
                 <ul>
                     <li className="flex flex-row justify-between px-10 py-3 rounded-[4px] min-w-[232px] bg-transparent">

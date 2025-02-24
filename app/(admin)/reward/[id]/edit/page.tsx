@@ -7,6 +7,7 @@ import { logout } from "@/lib";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { axiosInstance } from "@/lib/axios";
+import { toast } from "sonner";
 
 export default function Page() {
     const params = useParams();
@@ -14,26 +15,24 @@ export default function Page() {
     const [error, setError] = useState<string | null>(null);
     const [formData, setFormData] = useState({
         name: "",
-        address: "",
-        phone: "",
-        email: "",
-        website: "",
+        description: "",
+        points: 0,
+        stock: 0,
     });
 
     useEffect(() => {
         async function fetchData() {
             try {
-                const response = await axiosInstance.get(`/api/v1/hospital/detail/${id}`);
+                const response = await axiosInstance.get(`/api/v1/reward/detail/${id}`);
                 console.log(response, 'response')
 
-                const Data = await response.data;
+                const Data = await response.data.data.reward
                 setFormData(
                     {
-                        name: Data.data.hospital.name,
-                        address: Data.data.hospital.address,
-                        phone: Data.data.hospital.phone,
-                        email: Data.data.hospital.email,
-                        website: Data.data.hospital.website,
+                        name: Data.name,
+                        description: Data.description,
+                        points: Data.points,
+                        stock: Data.stock,
                     }
                 )
             } catch (error) {
@@ -50,25 +49,21 @@ export default function Page() {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
         try {
-            axiosInstance.post(`${baseUrl}/api/v1/hospital/create`, {
+            axiosInstance.put(`/api/v1/reward/update/${id}`, {
                 name: formData.name,
-                address: formData.address,
-                phone: formData.phone,
-                email: formData.email,
-                website: formData.website,
+                description: formData.description,
+                points: formData.points,
+                stock: formData.stock,
             })
                 .then(function (response) {
+                    toast.success('Reward updated successfully');
                     console.log(response);
                 })
                 .catch(function (error) {
                     console.log(error);
                 });
         } catch (error) {
-            if (axios.isAxiosError(error) && error.response?.status == 401) {
-                logout();
-            }
             setError(error instanceof Error ? error.message : 'An error occurred');
         }
     }
@@ -80,7 +75,7 @@ export default function Page() {
 
     return (
         <div className="h-full min-h-screen">
-            <Navbar title="Hospital Detail" />
+            <Navbar title="Edit Reward" />
             <form className="py-6 px-8" onSubmit={handleSubmit}>
                 <div className="w-full bg-white p-6 rounded-[8px]">
                     <div className="flex flex-row gap-6">
@@ -91,63 +86,45 @@ export default function Page() {
                                 </div>
                                 <input type="text" className="border border-gray2 rounded-[4px] p-4"
                                     value={formData.name}
-                                    readOnly
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                 />
                             </div>
                             <div className="flex flex-col gap-4 mt-6">
                                 <div className="flex flex-row w-full justify-between">
-                                    <label className="block text-[16px] font-semibold text-black">Address</label>
+                                    <label className="block text-[16px] font-semibold text-black">Description</label>
                                 </div>
                                 <input type="text" className="border border-gray2 rounded-[4px] p-4"
-                                    value={formData.address}
-                                    readOnly
+                                    value={formData.description}
+                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 />
                             </div>
                             <div className="flex flex-col gap-4 mt-6">
                                 <div className="flex flex-row w-full justify-between">
-                                    <label className="block text-[16px] font-semibold text-black">Phone</label>
+                                    <label className="block text-[16px] font-semibold text-black">stock</label>
                                 </div>
-                                <input type="text" className="border border-gray2 rounded-[4px] p-4"
-                                    value={formData.phone}
-                                    readOnly
+                                <input type="number" className="border border-gray2 rounded-[4px] p-4"
+                                    value={formData.stock}
+                                    onChange={(e) => setFormData({ ...formData, stock: Number(e.target.value) })}
                                 />
                             </div>
                             <div className="flex flex-col gap-4 mt-6">
                                 <div className="flex flex-row w-full justify-between">
-                                    <label className="block text-[16px] font-semibold text-black">Email</label>
+                                    <label className="block text-[16px] font-semibold text-black">points</label>
                                 </div>
-                                <input type="text" className="border border-gray2 rounded-[4px] p-4"
-                                    value={formData.email}
-                                    readOnly
-                                />
-                            </div>
-                            <div className="flex flex-col gap-4 mt-6">
-                                <div className="flex flex-row w-full justify-between">
-                                    <label className="block text-[16px] font-semibold text-black">Website</label>
-                                </div>
-                                <input type="text" className="border border-gray2 rounded-[4px] p-4"
-                                    value={formData.website}
-                                    readOnly
+                                <input type="number" className="border border-gray2 rounded-[4px] p-4"
+                                    value={formData.points}
+                                    onChange={(e) => setFormData({ ...formData, points: Number(e.target.value) })}
                                 />
                             </div>
                         </div>
-                        {/* <div className="w-1/2">
-                            <div className="flex flex-col gap-4">
-                                <label className="text-[14px] text-gray2">Alt Image</label>
-                                <input type="text" className="border border-gray2 rounded-[4px] p-2" />
-                            </div>
-                            <div className="flex flex-col gap-4">
-                                <label className="text-[14px] text-gray2">Link</label>
-                                <input type="text" className="border border-gray2 rounded-[4px] p-2" />
-                            </div>
-                        </div> */}
                     </div>
 
                 </div>
                 <div className="flex flex-row justify-end pt-6">
-                    <Link href="/hospital">
+                    <Link href="/reward">
                         <button className="bg-white border-[1px] border-gray2 text-gray2 font-semibold text-base rounded-[4px] w-[150px] py-4">Back</button>
                     </Link>
+                    <button type="submit" className="bg-primary text-white font-semibold text-base rounded-[4px] w-[150px] py-4 ml-4">Save</button>
                 </div>
             </form>
         </div>
