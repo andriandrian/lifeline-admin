@@ -17,7 +17,7 @@ export default function Page() {
                 const response = await axiosInstance.get('/api/v1/reward/list');
 
                 const Data = response.data;
-                setData(Data.data.rewards);
+                setData(Data.data.data);
             } catch (error) {
                 console.log(error instanceof Error ? error.message : 'An error occurred');
                 if (axios.isAxiosError(error) && error.response?.status === 500) {

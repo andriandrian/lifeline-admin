@@ -16,8 +16,8 @@ export default function Page() {
             try {
                 const response = await axiosInstance.get('/api/v1/faq/list');
 
-                const Data = response.data.data.faqs;
-                setData(Data);
+                const Data = response.data;
+                setData(Data.data.data);
             } catch (error) {
                 console.log(error instanceof Error ? error.message : 'An error occurred');
                 if (axios.isAxiosError(error) && error.response?.status === 500) {

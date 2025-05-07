@@ -16,7 +16,7 @@ export default function Page() {
             try {
                 const response = await axiosInstance.get('/api/v1/event/list');
 
-                const Data = await response.data.data.events;
+                const Data = await response.data.data.data;
                 setData(Data);
             } catch (error) {
                 if (axios.isAxiosError(error) && error.response) {

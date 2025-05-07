@@ -18,7 +18,7 @@ export default function Page() {
                 const response = await axiosInstance.get('/api/v1/news/list');
 
                 const Data = await response.data;
-                setData(Data.data.news);
+                setData(Data.data.data);
             } catch (error) {
                 if (axios.isAxiosError(error) && error.response?.status == 401) {
                     logout();

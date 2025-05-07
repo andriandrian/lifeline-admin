@@ -18,7 +18,7 @@ export default function Page() {
                 const response = await axiosInstance.get('/api/v1/hospital/list');
 
                 const Data = response.data;
-                setData(Data.data.hospitals);
+                setData(Data.data.data);
             } catch (error) {
                 if (axios.isAxiosError(error) && error.response?.status == 401) {
                     logout();

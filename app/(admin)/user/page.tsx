@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { columns } from "./columns"
 import { DataTable } from "./data-table"
 import Navbar from "@/components/ui/navbar";
+import { axiosInstance } from "@/lib/axios";
 
 export default function Page() {
     const [data, setData] = useState<[]>([]);
@@ -12,16 +13,11 @@ export default function Page() {
     useEffect(() => {
         async function fetchData() {
             try {
-                const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-                const response = await fetch(`${baseUrl}/api/v1/hospital?page=1&limit=10`);
+                const response = await axiosInstance.get('/api/v1/user/list?page=1&limit=10');
 
-                if (!response.ok) {
-                    throw new Error('Failed to fetch');
-                }
-
-                const Data = await response.json();
-                console.log(Data.data.news, 'data');
-                setData(Data.data.news);
+                const Data = await response.data;
+                console.log(response.data.data.data)
+                setData(Data.data.data);
             } catch (error) {
                 console.log(error);
                 setError(error instanceof Error ? error.message : 'An error occurred');

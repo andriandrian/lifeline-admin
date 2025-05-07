@@ -17,9 +17,9 @@ export default function Page() {
             try {
                 const response = await axiosInstance.get('/api/v1/donationRequest/list');
 
-                const Data = await response.data.data.donationRequests;
-                console.log(response.data.data.donationRequests)
-                setData(Data);
+                const Data = await response.data;
+                console.log(response.data.data.data)
+                setData(Data.data.data);
             } catch (error) {
                 if (axios.isAxiosError(error) && error.response?.status == 401) {
                     logout();

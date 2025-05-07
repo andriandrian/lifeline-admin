@@ -89,11 +89,14 @@ export default function Page() {
             }
             console.log(response.status, 'response.code')
 
-            if (response.data.code == 200) {
-                Cookies.set('name', response.data.data.user.user.firstname, { expires: 1 });
-                localStorage.setItem('name', response.data.data.user.user.firstname);
-                localStorage.setItem('userId', response.data.data.user.user.id);
+            if (response.status == 200) {
                 router.push('/dashboard');
+                Cookies.set('name', response.data.data.user.firstname, { expires: 1 });
+                localStorage.setItem('name', response.data.data.user.firstname);
+                localStorage.setItem('userId', response.data.data.user.id);
+                document.cookie = `Authorization=${response.data.data.Authorization}; path=/; max-age=${60 * 60 * 24}; HttpOnly; Secure`;
+                document.cookie = `refreshToken=${response.data.data.RefreshToken}; path=/; max-age=${60 * 60 * 24}; HttpOnly; Secure`;
+                console.log('success')
                 return;
             }
         } catch (error) {
