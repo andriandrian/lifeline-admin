@@ -7,6 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { CalendarFold, CircleUserRound, Gift, Hospital, Inbox, LayoutDashboard, LogOut, MessageCircleQuestion, Newspaper, UserRound } from "lucide-react";
 import Cookies from 'js-cookie';
 import { useEffect, useState } from "react";
+import { logout } from "@/lib";
 
 export default function SideNav() {
     const pathname = usePathname();
@@ -27,13 +28,19 @@ export default function SideNav() {
     async function handleLogout() {
         if (confirm("Are you sure you want to logout?")) {
             try {
-                Cookies.set('token', '', { expires: new Date(0) });
-                Cookies.remove('role');
+                // Call server action to remove httpOnly cookies
+                await logout();
+                
+                // Remove client-side cookies
                 Cookies.remove('name');
-                Cookies.remove('email');
+                
+                // Add a small delay to ensure cookies are cleared
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
                 router.push('/login');
+                router.refresh();
             } catch (error) {
-                console.log(error);
+                console.error("Logout error:", error);
             }
         }
     }

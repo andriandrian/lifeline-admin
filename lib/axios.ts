@@ -6,7 +6,7 @@ import axios, {
 import Cookies from "js-cookie";
 
 export const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BASE_URL || "https://103.196.155.242:8000",
+  baseURL: process.env.NEXT_PUBLIC_BASE_URL,
   withCredentials: true,
   headers: {
     Accept: "application/json",
@@ -46,6 +46,8 @@ axiosInstance.interceptors.response.use(
       } catch (refreshError) {
         Cookies.remove("token");
         Cookies.remove("name");
+        console.error("Refresh token failed:", refreshError);
+        window.location.href = "/login";
         return Promise.reject(refreshError);
       }
     }
