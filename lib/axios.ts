@@ -6,8 +6,12 @@ import axios, {
 import Cookies from "js-cookie";
 
 export const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BASE_URL,
+  baseURL: process.env.NEXT_PUBLIC_BASE_URL || "https://103.196.155.242:8000",
   withCredentials: true,
+  headers: {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  },
 });
 
 axiosInstance.interceptors.request.use(
@@ -40,8 +44,8 @@ axiosInstance.interceptors.response.use(
         // originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return axiosInstance(originalRequest);
       } catch (refreshError) {
-        Cookies.set("token", "");
-        Cookies.set("name", "");
+        Cookies.remove("token");
+        Cookies.remove("name");
         return Promise.reject(refreshError);
       }
     }
