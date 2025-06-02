@@ -4,7 +4,6 @@ import "../globals.css";
 import SideNav from "@/components/ui/sideNav";
 import { Toaster } from 'sonner'
 import { redirect } from "next/navigation";
-import { getSession } from "@/lib";
 import { cookies } from 'next/headers';
 
 const poppins = Poppins({
@@ -24,7 +23,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const accessToken = cookieStore.get("Authorization")?.value;
   const refreshToken = cookieStore.get("RefreshToken")?.value;
 

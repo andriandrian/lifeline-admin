@@ -122,6 +122,6 @@ export async function updateSession(request: NextRequest) {
 
     return response;
   } catch (error) {
-    return response;
+    return Response;
   }
 }
