@@ -3,8 +3,8 @@ import { Poppins } from 'next/font/google';
 import "../globals.css";
 import SideNav from "@/components/ui/sideNav";
 import { Toaster } from 'sonner'
-import { redirect } from "next/navigation";
-import { cookies } from 'next/headers';
+// import { redirect } from "next/navigation";
+// import { cookies } from 'next/headers';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -23,14 +23,14 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get("Authorization")?.value;
-  const refreshToken = cookieStore.get("RefreshToken")?.value;
+  // const cookieStore = await cookies();
+  // const accessToken = cookieStore.get("Authorization")?.value;
+  // const refreshToken = cookieStore.get("RefreshToken")?.value;
 
   // Check for either valid access token or refresh token
-  if (!accessToken && !refreshToken) {
-    redirect('/login');
-  }
+  // if (!accessToken && !refreshToken) {
+  //   redirect('/login');
+  // }
 
   return (
     <div
