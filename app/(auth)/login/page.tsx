@@ -62,47 +62,32 @@ export default function Page() {
     // }
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
-        // Check if the user is already logged in
-        // const token = Cookies.get('token')
-        // login fron ./lib
-
-
-        // if (token) {
-        //     // If a token exists, redirect to the dashboard
-        //     router.push('/dashboard');
-        //     return; // Exit the function early
-        // }
-        // console.log('values')
-
         try {
-            const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-            const response = await axiosInstance.post(`${baseUrl}/api/v1/login`, values);
-            console.log(response, 'response')
+            const response = await axiosInstance.post("/api/v1/login", values);
+
             if (response.status == 500) {
-                console.log('error')
                 return;
             }
             if (response.data.code == 400) {
-                console.log(response)
                 setErrorMessage(response.data.error);
                 return;
             }
-            console.log(response.status, 'response.code')
 
             if (response.status == 200) {
-                router.push('/dashboard');
+                // Only set user info in localStorage and cookies that aren't set by backend
                 Cookies.set('name', response.data.data.user.firstname, { expires: 1 });
                 localStorage.setItem('name', response.data.data.user.firstname);
                 localStorage.setItem('userId', response.data.data.user.id);
-                document.cookie = `Authorization=${response.data.data.Authorization}; path=/; max-age=${60 * 60 * 24}; HttpOnly; Secure`;
-                document.cookie = `refreshToken=${response.data.data.RefreshToken}; path=/; max-age=${60 * 60 * 24}; HttpOnly; Secure`;
-                console.log('success')
+
+                // Backend sets Authorization and RefreshToken cookies via Set-Cookie headers
+                router.push('/dashboard');
                 return;
             }
         } catch (error) {
             if (axios.isAxiosError(error) && error.response) {
-                console.log(error);
                 setErrorMessage(error.response.data.error);
+            } else {
+                setErrorMessage("An unexpected error occurred");
             }
         }
     }
