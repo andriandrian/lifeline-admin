@@ -98,21 +98,49 @@ export default function Home() {
         icon: React.ComponentType<{ className?: string }>;
         color: string;
         link: string;
-    }) => (
-        <Link href={link}>
-            <div className={`bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer border-l-4 ${color}`}>
-                <div className="flex items-center justify-between">
-                    <div>
-                        <p className="text-sm font-medium text-gray-600">{title}</p>
-                        <p className="text-3xl font-bold text-gray-900">{loading ? '...' : value}</p>
-                    </div>
-                    <div className={`p-3 rounded-full ${color.replace('border-l-', 'bg-').replace('-500', '-100')}`}>
-                        <Icon className={`w-6 h-6 ${color.replace('border-l-', 'text-').replace('-500', '-600')}`} />
+    }) => {
+        // Map colors to explicit Tailwind classes
+        const getIconStyles = (borderColor: string) => {
+            switch (borderColor) {
+                case 'border-l-blue-500':
+                    return { bg: 'bg-blue-100', text: 'text-blue-600' };
+                case 'border-l-red-500':
+                    return { bg: 'bg-red-100', text: 'text-red-600' };
+                case 'border-l-green-500':
+                    return { bg: 'bg-green-100', text: 'text-green-600' };
+                case 'border-l-purple-500':
+                    return { bg: 'bg-purple-100', text: 'text-purple-600' };
+                case 'border-l-indigo-500':
+                    return { bg: 'bg-indigo-100', text: 'text-indigo-600' };
+                case 'border-l-orange-500':
+                    return { bg: 'bg-orange-100', text: 'text-orange-600' };
+                case 'border-l-teal-500':
+                    return { bg: 'bg-teal-100', text: 'text-teal-600' };
+                case 'border-l-emerald-500':
+                    return { bg: 'bg-emerald-100', text: 'text-emerald-600' };
+                default:
+                    return { bg: 'bg-gray-100', text: 'text-gray-600' };
+            }
+        };
+
+        const iconStyles = getIconStyles(color);
+
+        return (
+            <Link href={link}>
+                <div className={`bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer border-l-4 ${color}`}>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm font-medium text-gray-600">{title}</p>
+                            <p className="text-3xl font-bold text-gray-900">{loading ? '...' : value}</p>
+                        </div>
+                        <div className={`p-3 rounded-full ${iconStyles.bg}`}>
+                            <Icon className={`w-6 h-6 ${iconStyles.text}`} />
+                        </div>
                     </div>
                 </div>
-            </div>
-        </Link>
-    );
+            </Link>
+        );
+    };
 
     return (
         <div className="h-full md:min-h-screen w-full bg-gray-50">
@@ -205,7 +233,7 @@ export default function Home() {
                                             <p className="font-medium text-gray-900">{user.firstname} {user.lastname}</p>
                                             <p className="text-sm text-gray-600">{user.email}</p>
                                         </div>
-                                        <span className={`px-2 py-1 rounded-full text-xs ${user.is_admin ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                                        <span className={`px-2 py-1 rounded text-xs ${user.is_admin ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-blue-100 text-blue-800 border border-blue-200'}`}>
                                             {user.is_admin ? 'Admin' : 'User'}
                                         </span>
                                     </div>
