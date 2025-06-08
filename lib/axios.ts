@@ -14,6 +14,16 @@ export const axiosInstance = axios.create({
   },
 });
 
+// Function to update content type when needed
+const updateContentType = (config: InternalAxiosRequestConfig) => {
+  // Don't modify content-type for FormData - let the browser set it with boundary
+  if (config.data instanceof FormData) {
+    // Remove content-type to let the browser set it with proper boundary
+    delete config.headers["Content-Type"];
+  }
+  return config;
+};
+
 axiosInstance.interceptors.request.use(
   async (axiosConfig: InternalAxiosRequestConfig) => {
     const accessToken = Cookies.get("Authorization");
@@ -31,7 +41,9 @@ axiosInstance.interceptors.request.use(
         }
       }
     }
-    return axiosConfig;
+
+    // Handle FormData content type properly
+    return updateContentType(axiosConfig);
   }
 );
 
@@ -41,6 +53,7 @@ axiosInstance.interceptors.response.use(
   },
   async (error: AxiosError) => {
     const originalRequest = error.config;
+
     if (!originalRequest || originalRequest.url === "/api/v1/refreshToken") {
       return Promise.reject(error);
     }
@@ -53,6 +66,7 @@ axiosInstance.interceptors.response.use(
         Cookies.remove("Authorization");
         Cookies.remove("RefreshToken");
         Cookies.remove("name");
+        Cookies.remove("userId");
         window.location.href = "/login";
         return Promise.reject(refreshError);
       }

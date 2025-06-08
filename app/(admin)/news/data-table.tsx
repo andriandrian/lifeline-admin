@@ -46,7 +46,7 @@ export function DataTable<TData, TValue>({
         getFilteredRowModel: getFilteredRowModel(),
         initialState: {
             pagination: {
-                pageSize: 5,
+                pageSize: 10,
             },
         },
         state: {

@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Navbar from "@/components/ui/navbar";
-import axios from "axios";
-import { logout } from "@/lib";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { axiosInstance } from "@/lib/axios";
@@ -32,29 +30,41 @@ export default function Page() {
     useEffect(() => {
         async function fetchData() {
             try {
-                const response = await axiosInstance.get(`api/v1/donationRequest/detail/${id}`);
+                const response = await axiosInstance.get(`/api/v1/donationRequest/detail/${id}`);
                 console.log(response.data.data, 'response')
 
-                const Data = await response.data.data.donationRequest;
+                if (!response.data || !response.data.data) {
+                    throw new Error("Invalid API response structure");
+                }
+
+                // Handle different response structures
+                const donationRequestData = response.data.data.donationRequest || response.data.data;
+                const Data = donationRequestData;
+
+                if (!Data) {
+                    throw new Error("Donation request not found");
+                }
+
                 const date = new Date(Data.createdAt)
                 const formattedDate = date.toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "long",
                     day: "numeric",
                 })
-                const fullname = Data.user.firstname + ' ' + Data.user.lastname;
+
+                const fullname = Data.user ? `${Data.user.firstname || ''} ${Data.user.lastname || ''}`.trim() : 'Unknown';
                 setFormData(
                     {
                         name: fullname,
-                        bloodType: Data.bloodType,
-                        description: Data.description,
-                        hospital: Data.hospital.name,
-                        gender: Data.patientGender,
-                        reason: Data.reason,
-                        priority: Data.priority,
-                        hospitalPhone: Data.hospital.phone,
-                        age: Data.patientAge,
-                        patientRecordNumber: Data.patientRecordNumber,
+                        bloodType: Data.bloodType || 'Unknown',
+                        description: Data.description || 'No description',
+                        hospital: Data.hospital ? Data.hospital.name : 'Unknown',
+                        gender: Data.patientGender || 'Unknown',
+                        reason: Data.reason || 'No reason provided',
+                        priority: Data.priority || 'Unknown',
+                        hospitalPhone: Data.hospital ? Data.hospital.phone : 'Unknown',
+                        age: Data.patientAge || 'Unknown',
+                        patientRecordNumber: Data.patientRecordNumber || 'Unknown',
                         createdAt: formattedDate,
                         verifiedAt: Data.verifiedAt ? Data.verifiedAt : 'Not Verified',
                         closedAt: Data.closedAt ? Data.closedAt : 'Not Closed',
@@ -62,9 +72,6 @@ export default function Page() {
                     }
                 )
             } catch (error) {
-                if (axios.isAxiosError(error) && error.response?.status == 401) {
-                    logout();
-                }
                 setError(error instanceof Error ? error.message : 'An error occurred');
             }
         }

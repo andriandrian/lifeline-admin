@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Navbar from "@/components/ui/navbar";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -71,11 +70,8 @@ export default function Page() {
                     console.log(error);
                 });
         } catch (error) {
-            if (axios.isAxiosError(error) && error.response) {
-                setError(error.response.data.error);
-            } else {
-                setError('An error occurred');
-            }
+            console.error("Error creating event:", error);
+            setError('An error occurred while creating event');
         }
     }
 

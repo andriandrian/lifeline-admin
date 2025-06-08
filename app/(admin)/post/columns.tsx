@@ -1,8 +1,6 @@
 "use client"
 
-import { logout } from "@/lib"
 import { ColumnDef } from "@tanstack/react-table"
-import axios from "axios"
 import { Eye, Pencil, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
@@ -112,9 +110,8 @@ export const columns: ColumnDef<Post>[] = [
         if (!confirm("Are you sure you want to delete this data?")) {
           return null
         }
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
         try {
-          axiosInstance.delete(`${baseUrl}/api/v1/donationRequest/delete/${id}`)
+          axiosInstance.delete(`/api/v1/donationRequest/delete/${id}`)
             .then(function () {
               toast.success('Post has been deleted')
               setTimeout(() => {
@@ -125,10 +122,7 @@ export const columns: ColumnDef<Post>[] = [
               console.log(error);
             })
         } catch (error) {
-          if (axios.isAxiosError(error) && error.response?.status == 401) {
-            logout();
-          }
-          console.log(error)
+          console.error("Error deleting post:", error);
         }
       }
 

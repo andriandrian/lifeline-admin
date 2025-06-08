@@ -4,8 +4,6 @@ import { useEffect, useState } from "react";
 import { columns } from "./columns"
 import { DataTable } from "./data-table"
 import Navbar from "@/components/ui/navbar";
-import axios from "axios";
-import { logout } from "@/lib";
 import { axiosInstance } from "@/lib/axios";
 
 export default function Page() {
@@ -21,10 +19,8 @@ export default function Page() {
                 console.log(response.data.data.data)
                 setData(Data.data.data);
             } catch (error) {
-                if (axios.isAxiosError(error) && error.response?.status == 401) {
-                    logout();
-                }
-                setError(error instanceof Error ? error.message : 'An error occurred');
+                console.error("Error fetching donation request:", error);
+                setError('An error occurred while fetching donation request');
             }
         }
 

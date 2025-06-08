@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Navbar from "@/components/ui/navbar";
-import axios from "axios";
-import { logout } from "@/lib";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { axiosInstance } from "@/lib/axios";
@@ -36,10 +34,8 @@ export default function Page() {
                     }
                 )
             } catch (error) {
-                if (axios.isAxiosError(error) && error.response?.status == 401) {
-                    logout();
-                }
-                setError(error instanceof Error ? error.message : 'An error occurred');
+                console.error("Error fetching reward:", error);
+                setError('An error occurred while fetching reward');
             }
         }
 

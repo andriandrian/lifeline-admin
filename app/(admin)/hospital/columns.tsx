@@ -1,8 +1,6 @@
 "use client"
 
-import { logout } from "@/lib"
 import { ColumnDef } from "@tanstack/react-table"
-import axios from "axios"
 import { Eye, Pencil, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
@@ -54,9 +52,8 @@ export const columns: ColumnDef<Hospital>[] = [
         if (!confirm("Are you sure you want to delete this data?")) {
           return null
         }
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
         try {
-          axiosInstance.delete(`${baseUrl}/api/v1/hospital/delete/${id}`)
+          axiosInstance.delete(`/api/v1/hospital/delete/${id}`)
             .then(function () {
               toast.success('Hospital has been deleted')
               setTimeout(() => {
@@ -64,12 +61,10 @@ export const columns: ColumnDef<Hospital>[] = [
               }, 1500)
             })
             .catch(function (error) {
-              console.log(error);
+              console.error("Error:", error);
+              toast.error("An error occurred");
             })
         } catch (error) {
-          if (axios.isAxiosError(error) && error.response?.status == 401) {
-            logout();
-          }
           console.log(error)
         }
       }

@@ -2,9 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Navbar from "@/components/ui/navbar";
-import axios from "axios";
 import { Plus } from "lucide-react";
-import { logout } from "@/lib";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -25,7 +23,6 @@ export default function Page() {
         imageUrlFormatted: "",
         user: "",
         userId: "",
-        createdAt: "",
     });
 
     const onChangePicture = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,35 +42,25 @@ export default function Page() {
     useEffect(() => {
         async function fetchData() {
             try {
-                const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-                const response = await axiosInstance.get(`${baseUrl}/api/v1/news/detail/${id}`);
-                console.log(response.data.data, 'response')
+                const response = await axiosInstance.get(`/api/v1/news/detail/${id}`);
+                console.log(response.data, 'response');
 
-                const Data = await response.data.data.news;
-                const date = new Date(Data.createdAt)
-                const formattedDate = date.toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                })
-                const imageUrlFormatted = `${baseUrl}${Data.imageUrl}`;
-                setFormData(
-                    {
-                        title: Data.title,
-                        content: Data.content,
-                        image: '',
-                        imageUrl: Data.imageUrl,
-                        imageUrlFormatted: imageUrlFormatted,
-                        user: Data.user.firstname,
-                        userId: Data.user.id,
-                        createdAt: formattedDate,
-                    }
-                )
+                const newsData = response.data.data;
+
+                const imageUrlFormatted = newsData.imageUrl;
+
+                setFormData({
+                    title: newsData.title,
+                    content: newsData.content,
+                    image: '',
+                    imageUrl: newsData.imageUrl,
+                    imageUrlFormatted: imageUrlFormatted,
+                    user: newsData.user.firstname,
+                    userId: newsData.user.id,
+                });
             } catch (error) {
-                if (axios.isAxiosError(error) && error.response?.status == 401) {
-                    logout();
-                }
-                setError(error instanceof Error ? error.message : 'An error occurred');
+                console.error("Error fetching news:", error);
+                setError('An error occurred while fetching news');
             }
         }
 
@@ -83,7 +70,6 @@ export default function Page() {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
         try {
             const formDataToSend = new FormData();
             formDataToSend.append('title', formData.title);
@@ -93,25 +79,13 @@ export default function Page() {
                 formDataToSend.append('image', picture);
             }
 
-            axiosInstance.put(`${baseUrl}/api/v1/news/update/${id}`, formDataToSend, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            })
-                .then(function (response) {
-                    toast.success('News updated successfully');
-                    console.log(response);
-                })
-                .catch(function (error) {
-                    toast.error(error.response.data.error);
-                    console.log(error);
-                });
+            const response = await axiosInstance.put(`/api/v1/news/update/${id}`, formDataToSend);
+            toast.success('News updated successfully');
+            console.log(response);
         } catch (error) {
-            if (axios.isAxiosError(error) && error.response) {
-                setError(error.response.data.error);
-            } else {
-                setError('An error occurred');
-            }
+            console.error("Error updating news:", error);
+            setError('An error occurred while updating news');
+            toast.error('An error occurred while updating news');
         }
     }
 
@@ -179,24 +153,6 @@ export default function Page() {
                                 {formData.imageUrlFormatted && !imgData &&
                                     <Image src={formData.imageUrlFormatted} alt="Preview" width={200} height={200} />
                                 }
-                            </div>
-                            <div className="flex flex-col gap-4 mt-6">
-                                <div className="flex flex-row w-full justify-between">
-                                    <label className="block text-[16px] font-semibold text-black">Created by</label>
-                                </div>
-                                <input type="text" className="rounded-[4px] py-1"
-                                    value={formData.user}
-                                    readOnly
-                                />
-                            </div>
-                            <div className="flex flex-col gap-4 mt-6">
-                                <div className="flex flex-row w-full justify-between">
-                                    <label className="block text-[16px] font-semibold text-black">Created at</label>
-                                </div>
-                                <input type="text" className="rounded-[4px] py-1"
-                                    value={formData.createdAt}
-                                    readOnly
-                                />
                             </div>
                         </div>
                         {/* <div className="w-1/2">

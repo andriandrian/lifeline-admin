@@ -45,7 +45,7 @@ export function DataTable<TData, TValue>({
         getFilteredRowModel: getFilteredRowModel(),
         initialState: {
             pagination: {
-                pageSize: 5,
+                pageSize: 10,
             },
         },
         state: {
@@ -77,12 +77,6 @@ export function DataTable<TData, TValue>({
                         <option value="0">Not Admin</option>
                     </select>
                 </div>
-                {/* <Link href="/reward/add" className="flex flex-row px-6 py-4 rounded-sm items-center bg-primary text-white">
-                    <Plus className="mr-2" />
-                    <p className="text-[16px] font-semibold text-nowrap pr-2">
-                        Add FAQ
-                    </p>
-                </Link> */}
             </div>
             <div className="rounded-md border">
                 <Table>

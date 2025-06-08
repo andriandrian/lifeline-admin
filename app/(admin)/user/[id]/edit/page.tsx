@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Navbar from "@/components/ui/navbar";
-import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { axiosInstance } from "@/lib/axios";
@@ -48,11 +47,8 @@ export default function Page() {
                     point: Data.point || 0,
                 });
             } catch (error) {
-                if (axios.isAxiosError(error) && error.response) {
-                    setError(error.response.data.error);
-                } else {
-                    setError('An error occurred');
-                }
+                console.error("Error fetching user:", error);
+                setError('An error occurred while fetching user');
             }
         }
 
@@ -78,13 +74,8 @@ export default function Page() {
             toast.success('User updated successfully');
             router.push(`/user/${id}`);
         } catch (error) {
-            if (axios.isAxiosError(error) && error.response) {
-                toast.error(error.response.data.error || 'Failed to update user');
-                setError(error.response.data.error);
-            } else {
-                toast.error('An error occurred');
-                setError('An error occurred');
-            }
+            console.error("Error updating user:", error);
+            setError('An error occurred while updating user');
         }
     };
 

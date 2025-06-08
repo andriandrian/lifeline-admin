@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Navbar from "@/components/ui/navbar";
-import axios from "axios";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -24,32 +23,33 @@ export default function Page() {
     useEffect(() => {
         async function fetchData() {
             try {
-                const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-                const response = await axiosInstance.get(`${baseUrl}/api/v1/news/detail/${id}`);
-                console.log(response.data.data, 'response')
+                // Use the /api route which will be rewritten by Next.js
+                const response = await axiosInstance.get(`/api/v1/news/detail/${id}`);
+                console.log(response.data, 'response');
 
-                const Data = response.data.data.news;
-                const date = new Date(Data.createdAt)
+                const newsData = response.data.data;
+
+                const date = new Date(newsData.createdAt)
                 const formattedDate = date.toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "long",
                     day: "numeric",
-                })
-                const imageUrlFormatted = `${baseUrl}${Data.imageUrl}`;
+                });
+
+                // Use the image URL directly from the API
+                const imageUrlFormatted = newsData.imageUrl;
+
                 setFormData({
-                    title: Data.title,
-                    content: Data.content,
-                    imageUrl: Data.imageUrl,
+                    title: newsData.title,
+                    content: newsData.content,
+                    imageUrl: newsData.imageUrl,
                     imageUrlFormatted: imageUrlFormatted,
-                    user: Data.user.firstname,
+                    user: newsData.user.firstname,
                     createdAt: formattedDate,
                 });
             } catch (error) {
-                if (axios.isAxiosError(error) && error.response) {
-                    setError(error.response.data.error);
-                } else {
-                    setError('An error occurred');
-                }
+                console.error('Error fetching news data:', error);
+                setError('Failed to load news data. Please try again later.');
             }
         }
 

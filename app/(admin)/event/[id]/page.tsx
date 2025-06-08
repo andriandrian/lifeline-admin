@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Navbar from "@/components/ui/navbar";
-import axios from "axios";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -26,11 +25,14 @@ export default function Page() {
     useEffect(() => {
         async function fetchData() {
             try {
-                const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-                const response = await axiosInstance.get(`${baseUrl}/api/v1/event/detail/${id}`);
-                console.log(response.data.data, 'response')
+                const response = await axiosInstance.get(`/api/v1/event/detail/${id}`);
 
-                const Data = response.data.data.event;
+                console.log('Full response:', response);
+                console.log('Response data:', response.data);
+                console.log('Response data.data:', response.data.data);
+                console.log('Title from API:', response.data.data ? response.data.data.title : 'No title found');
+
+                const Data = response.data.data;
                 const createdAt = new Date(Data.createdAt)
                 const formattedDate = createdAt.toLocaleDateString("en-US", {
                     year: "numeric",
@@ -49,7 +51,13 @@ export default function Page() {
                     month: "long",
                     day: "numeric",
                 })
-                const imageUrlFormatted = `${baseUrl}${Data.imageUrl}`;
+
+                // Use the imageUrl directly from the API without concatenation
+                // S3 URLs are already complete
+                const imageUrlFormatted = Data.imageUrl;
+
+                console.log('Image URL to display:', imageUrlFormatted);
+
                 setFormData({
                     title: Data.title,
                     description: Data.description,
@@ -61,11 +69,8 @@ export default function Page() {
                     createdAt: formattedDate,
                 });
             } catch (error) {
-                if (axios.isAxiosError(error) && error.response) {
-                    setError(error.response.data.error);
-                } else {
-                    setError('An error occurred');
-                }
+                console.error("Error fetching events:", error);
+                setError('An error occurred while fetching events');
             }
         }
 
@@ -148,7 +153,7 @@ export default function Page() {
 
                 </div>
                 <div className="flex flex-row justify-end pt-6">
-                    <Link href="/news">
+                    <Link href="/event">
                         <button className="bg-white border-[1px] border-gray2 text-gray2 font-semibold text-base rounded-[4px] w-[150px] py-4">Back</button>
                     </Link>
                 </div>

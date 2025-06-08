@@ -5,7 +5,6 @@ import { columns } from "./columns"
 import { DataTable } from "./data-table"
 import Navbar from "@/components/ui/navbar";
 import { axiosInstance } from "@/lib/axios";
-import axios from "axios";
 
 export default function Page() {
     const [data, setData] = useState<[]>([]);
@@ -19,10 +18,8 @@ export default function Page() {
                 const Data = response.data;
                 setData(Data.data.data);
             } catch (error) {
-                console.log(error instanceof Error ? error.message : 'An error occurred');
-                if (axios.isAxiosError(error) && error.response?.status === 500) {
-                    setError(error.response.data.message);
-                }
+                console.error("Error fetching FAQ:", error);
+                setError('An error occurred while fetching data');
             }
         }
 

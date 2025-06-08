@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Navbar from "@/components/ui/navbar";
-import axios from "axios";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { axiosInstance } from "@/lib/axios";
@@ -56,11 +55,8 @@ export default function Page() {
                     created_at: createdAtFormatted,
                 });
             } catch (error) {
-                if (axios.isAxiosError(error) && error.response) {
-                    setError(error.response.data.error);
-                } else {
-                    setError('An error occurred');
-                }
+                console.error("Error fetching user:", error);
+                setError('An error occurred while fetching user');
             }
         }
 

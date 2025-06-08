@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Navbar from "@/components/ui/navbar";
-import axios from "axios";
-import { logout } from "@/lib";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { axiosInstance } from "@/lib/axios";
@@ -37,10 +35,8 @@ export default function Page() {
                     }
                 )
             } catch (error) {
-                if (axios.isAxiosError(error) && error.response?.status == 401) {
-                    logout();
-                }
-                setError(error instanceof Error ? error.message : 'An error occurred');
+                console.error("Error fetching hospital:", error);
+                setError('An error occurred while fetching hospital');
             }
         }
 
@@ -50,9 +46,8 @@ export default function Page() {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
         try {
-            axiosInstance.post(`${baseUrl}/api/v1/hospital/create`, {
+            axiosInstance.post(`/api/v1/hospital/create`, {
                 name: formData.name,
                 address: formData.address,
                 phone: formData.phone,
@@ -66,10 +61,8 @@ export default function Page() {
                     console.log(error);
                 });
         } catch (error) {
-            if (axios.isAxiosError(error) && error.response?.status == 401) {
-                logout();
-            }
-            setError(error instanceof Error ? error.message : 'An error occurred');
+            console.error("Error updating hospital:", error);
+            setError('An error occurred while updating hospital');
         }
     }
 

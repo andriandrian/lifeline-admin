@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { columns } from "./columns"
 import { DataTable } from "./data-table"
 import Navbar from "@/components/ui/navbar";
-import axios from "axios";
 import { axiosInstance } from "@/lib/axios";
 
 export default function Page() {
@@ -19,11 +18,8 @@ export default function Page() {
                 const Data = await response.data.data.data;
                 setData(Data);
             } catch (error) {
-                if (axios.isAxiosError(error) && error.response) {
-                    setError(error.response.data.error);
-                } else {
-                    setError('An error occurred');
-                }
+                console.error("Error fetching events:", error);
+                setError('An error occurred while fetching events');
             }
         }
 

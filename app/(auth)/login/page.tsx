@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useRouter } from "next/navigation"
-import axios from "axios"
 import { useState } from "react"
 import { axiosInstance } from "@/lib/axios"
 
@@ -76,6 +75,7 @@ export default function Page() {
             if (response.status == 200) {
                 // Only set user info in localStorage and cookies that aren't set by backend
                 Cookies.set('name', response.data.data.user.firstname, { expires: 1 });
+                Cookies.set('userId', response.data.data.user.id, { expires: 1 });
                 localStorage.setItem('name', response.data.data.user.firstname);
                 localStorage.setItem('userId', response.data.data.user.id);
 
@@ -84,11 +84,8 @@ export default function Page() {
                 return;
             }
         } catch (error) {
-            if (axios.isAxiosError(error) && error.response) {
-                setErrorMessage(error.response.data.error);
-            } else {
-                setErrorMessage("An unexpected error occurred");
-            }
+            console.error("Error logging in:", error);
+            setErrorMessage("An unexpected error occurred");
         }
     }
 

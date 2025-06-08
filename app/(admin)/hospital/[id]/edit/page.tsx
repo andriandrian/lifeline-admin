@@ -2,11 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Navbar from "@/components/ui/navbar";
-import axios from "axios";
-import { logout } from "@/lib";
 import { useParams } from "next/navigation";
-import { axiosInstance } from "@/lib/axios";
 import { toast } from "sonner";
+import { axiosInstance } from "@/lib/axios";
 
 export default function Page() {
     const params = useParams();
@@ -37,10 +35,8 @@ export default function Page() {
                     }
                 )
             } catch (error) {
-                if (axios.isAxiosError(error) && error.response?.status == 401) {
-                    logout();
-                }
-                setError(error instanceof Error ? error.message : 'An error occurred');
+                console.error("Error fetching hospital:", error);
+                setError('An error occurred while fetching hospital');
             }
         }
 
@@ -66,10 +62,8 @@ export default function Page() {
                     console.log(error);
                 });
         } catch (error) {
-            if (axios.isAxiosError(error) && error.response?.status == 401) {
-                logout();
-            }
-            setError(error instanceof Error ? error.message : 'An error occurred');
+            console.error("Error updating hospital:", error);
+            setError('An error occurred while updating hospital');
         }
     }
 

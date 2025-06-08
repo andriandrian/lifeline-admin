@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
         port: "8080",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "lifeline-beval.s3.ap-southeast-2.amazonaws.com",
+        pathname: "/**",
+      },
     ],
   },
   async rewrites() {
