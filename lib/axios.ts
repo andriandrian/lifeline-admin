@@ -6,7 +6,7 @@ import axios, {
 import Cookies from "js-cookie";
 
 export const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BASE_URL,
+  baseURL: "",
   withCredentials: true,
   headers: {
     Accept: "application/json",
@@ -23,6 +23,13 @@ axiosInstance.interceptors.request.use(
         axiosConfig.headers.Authorization = `Bearer ${accessToken}`;
       }
       axiosConfig.headers.Accept = "application/json";
+
+      if (axiosConfig.url === "/api/v1/refreshToken") {
+        const refreshToken = Cookies.get("RefreshToken");
+        if (refreshToken) {
+          axiosConfig.headers["Refresh-Token"] = refreshToken;
+        }
+      }
     }
     return axiosConfig;
   }
@@ -41,12 +48,11 @@ axiosInstance.interceptors.response.use(
     if (error.response?.status === 401) {
       try {
         await axiosInstance.get("/api/v1/refreshToken");
-        // originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         return axiosInstance(originalRequest);
       } catch (refreshError) {
-        Cookies.remove("token");
+        Cookies.remove("Authorization");
+        Cookies.remove("RefreshToken");
         Cookies.remove("name");
-        console.error("Refresh token failed:", refreshError);
         window.location.href = "/login";
         return Promise.reject(refreshError);
       }
