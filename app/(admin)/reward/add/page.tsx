@@ -35,12 +35,19 @@ export default function Page() {
             return;
         }
 
+        // Validate points (must be filled and greater than 0)
+        if (!formData.points || formData.points <= 0) {
+            toast.error("Points must be greater than 0");
+            setIsSubmitting(false);
+            return;
+        }
+
         try {
             const response = await axiosInstance.post(`/api/v1/reward/create`, {
                 name: formData.name,
                 description: formData.description,
                 points: formData.points,
-                stock: formData.stock,
+                stock: formData.stock || 0, // Default to 0 if not provided
             });
 
             console.log("Creation response:", response.data);
@@ -100,10 +107,10 @@ export default function Page() {
                                 <input
                                     className="border border-gray2 rounded-[4px] p-4"
                                     type="number"
-                                    value={formData.stock}
-                                    onChange={(e) => setFormData({ ...formData, stock: Number(e.target.value) })}
+                                    placeholder="0"
+                                    value={formData.stock || ''}
+                                    onChange={(e) => setFormData({ ...formData, stock: Number(e.target.value) || 0 })}
                                     min="0"
-                                    required
                                 />
                             </div>
                             <div className="flex flex-col gap-4 mt-6">
@@ -111,11 +118,12 @@ export default function Page() {
                                     <label className="block text-[16px] font-semibold text-black">Points</label>
                                 </div>
                                 <input
-                                    className="border border-gray2 rounded-[4px] p-4"
+                                    className="border border-gray2 rounded-[4px] p-4 appearance-none"
                                     type="number"
-                                    value={formData.points}
+                                    placeholder="0"
+                                    value={formData.points || ''}
                                     onChange={(e) => setFormData({ ...formData, points: Number(e.target.value) })}
-                                    min="0"
+                                    min="1"
                                     required
                                 />
                             </div>
