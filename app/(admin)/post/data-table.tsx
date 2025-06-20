@@ -57,7 +57,7 @@ export function DataTable<TData, TValue>({
         <div>
             <div className="flex items-center py-4 gap-6">
                 <Input
-                    placeholder="Search"
+                    placeholder="Search by name"
                     value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                         table.getColumn("name")?.setFilterValue(event.target.value)
@@ -72,18 +72,27 @@ export function DataTable<TData, TValue>({
                         }
                         className="border border-gray2 rounded-[4px] p-4 border-opacity-30"
                     >
-                        <option value="">All</option>
+                        <option value="">All Priorities</option>
                         <option value="low">Low</option>
                         <option value="mid">Mid</option>
                         <option value="high">High</option>
                     </select>
                 </div>
-                {/* <Link href="/news/add" className="flex flex-row px-6 py-4 rounded-sm items-center bg-primary text-white">
-                    <Plus className="mr-2" />
-                    <p className="text-[16px] font-semibold text-nowrap pr-4">
-                        Add Post
-                    </p>
-                </Link> */}
+                <div>
+                    <select
+                        value={(table.getColumn("status")?.getFilterValue() as string) ?? ""}
+                        onChange={(event) =>
+                            table.getColumn("status")?.setFilterValue(event.target.value)
+                        }
+                        className="border border-gray2 rounded-[4px] p-4 border-opacity-30"
+                    >
+                        <option value="">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="verified">Verified</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="closed">Closed</option>
+                    </select>
+                </div>
             </div>
             <div className="rounded-md border">
                 <Table>

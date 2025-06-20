@@ -35,7 +35,7 @@ export default function Page() {
 
     return (
         <div className="h-full md:min-h-screen">
-            <Navbar title="Donation Request" />
+            <Navbar title="Post" />
             <div className="py-6 px-8">
                 <div className="w-full bg-white p-6 rounded-[8px]">
                     <DataTable columns={columns} data={data} />

@@ -17,6 +17,9 @@ export type Post = {
   hospital: {
     name: string
   }
+  verifiedAt: string | null
+  rejectedAt: string | null
+  closedAt: string | null
   index: number
 }
 
@@ -98,6 +101,48 @@ export const columns: ColumnDef<Post>[] = [
             </p>
           </div>
         </div >
+      )
+    }
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    filterFn: (row, columnId, value) => {
+      const { verifiedAt, rejectedAt, closedAt } = row.original;
+
+      let status = "pending";
+      if (closedAt) status = "closed";
+      else if (rejectedAt) status = "rejected";
+      else if (verifiedAt) status = "verified";
+
+      if (value === "") return true;
+      return status === value;
+    },
+    cell: ({ row }) => {
+      const { verifiedAt, rejectedAt, closedAt } = row.original;
+
+      let status = "Pending";
+      let statusColor = "bg-yellow-100 text-yellow-800";
+
+      if (closedAt) {
+        status = "Closed";
+        statusColor = "bg-gray-100 text-gray-800";
+      } else if (rejectedAt) {
+        status = "Rejected";
+        statusColor = "bg-red-100 text-red-800";
+      } else if (verifiedAt) {
+        status = "Verified";
+        statusColor = "bg-green-100 text-green-800";
+      }
+
+      return (
+        <div className="flex flex-row gap-2">
+          <div className={`rounded-[50px] ${statusColor} px-4 py-2`}>
+            <p className="font-semibold text-[14px]">
+              {status}
+            </p>
+          </div>
+        </div>
       )
     }
   },
