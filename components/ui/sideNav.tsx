@@ -4,7 +4,7 @@ import Image from "next/image";
 import Logo from "@/public/logo.svg";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { CalendarFold, CircleUserRound, Gift, Hospital, Inbox, LayoutDashboard, LogOut, MessageCircleQuestion, Newspaper, UserRound } from "lucide-react";
+import { CalendarFold, CircleUserRound, Gift, Hospital, Inbox, LayoutDashboard, LogOut, MessageCircleQuestion, Newspaper, UserRound, HandHeart } from "lucide-react";
 import Cookies from 'js-cookie';
 import { useEffect, useState } from "react";
 import { logout } from "@/lib";
@@ -30,13 +30,13 @@ export default function SideNav() {
             try {
                 // Call server action to remove httpOnly cookies
                 await logout();
-                
+
                 // Remove client-side cookies
                 Cookies.remove('name');
-                
+
                 // Add a small delay to ensure cookies are cleared
                 await new Promise(resolve => setTimeout(resolve, 100));
-                
+
                 router.push('/login');
                 router.refresh();
             } catch (error) {
@@ -62,7 +62,14 @@ export default function SideNav() {
                     <li className={`px-5 py-3 rounded-[4px] min-w-[232px] ${pathname.startsWith("/post") ? "bg-white bg-opacity-20 text-black" : "bg-transparent"}`}>
                         <Link href="/post" className="flex flex-row gap-3 items-center">
                             <Inbox className="text-white" />
-                            <p className={`text-white font-medium`}>Donation</p>
+                            <p className={`text-white font-medium`}>Post</p>
+                        </Link>
+                    </li>
+
+                    <li className={`px-5 py-3 rounded-[4px] min-w-[232px] ${pathname.startsWith("/request") ? "bg-white bg-opacity-20 text-black" : "bg-transparent"}`}>
+                        <Link href="/request" className="flex flex-row gap-3 items-center">
+                            <HandHeart className="text-white" />
+                            <p className={`text-white font-medium`}>Request</p>
                         </Link>
                     </li>
 
