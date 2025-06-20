@@ -181,7 +181,7 @@ export default function Page() {
         setActionLoading(action);
 
         try {
-            let requestBody: any = { type: action };
+            let requestBody: { type: string; rejectionReason?: string; updatedBy?: number } = { type: action };
 
             if (action === 'REJECT') {
                 if (!rejectionReason.trim()) {
