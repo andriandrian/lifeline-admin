@@ -24,14 +24,15 @@ export default function Page() {
                 const response = await axiosInstance.get(`/api/v1/hospital/detail/${id}`);
                 console.log(response, 'response')
 
-                const Data = await response.data;
+                console.log(response, 'Data')
+                const Data = response.data.data;
                 setFormData(
                     {
-                        name: Data.data.hospital.name,
-                        address: Data.data.hospital.address,
-                        phone: Data.data.hospital.phone,
-                        email: Data.data.hospital.email,
-                        website: Data.data.hospital.website,
+                        name: Data.name,
+                        address: Data.address,
+                        phone: Data.phone,
+                        email: Data.email,
+                        website: Data.website,
                     }
                 )
             } catch (error) {

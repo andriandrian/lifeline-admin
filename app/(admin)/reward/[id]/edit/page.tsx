@@ -24,7 +24,7 @@ export default function Page() {
                 const response = await axiosInstance.get(`/api/v1/reward/detail/${id}`);
                 console.log(response, 'response')
 
-                const Data = await response.data.data.reward
+                const Data = await response.data.data
                 setFormData(
                     {
                         name: Data.name,

@@ -27,11 +27,11 @@ export default function Page() {
                 const Data = await response.data;
                 setFormData(
                     {
-                        name: Data.data.hospital.name,
-                        address: Data.data.hospital.address,
-                        phone: Data.data.hospital.phone,
-                        email: Data.data.hospital.email,
-                        website: Data.data.hospital.website,
+                        name: Data.data.name,
+                        address: Data.data.address,
+                        phone: Data.data.phone,
+                        email: Data.data.email,
+                        website: Data.data.website,
                     }
                 )
             } catch (error) {

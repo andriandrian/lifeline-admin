@@ -29,7 +29,7 @@ export default function Page() {
             })
                 .then(function (response) {
                     console.log(response);
-                    router.push(`/hospital/${response.data.data.hospital.id}`)
+                    router.push(`/hospital/${response.data.data.id}`)
                     toast.success('Hospital has been created')
                 })
                 .catch(function (error) {
