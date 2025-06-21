@@ -181,7 +181,11 @@ export default function Page() {
         setActionLoading(action);
 
         try {
-            let requestBody: { type: string; rejectionReason?: string; updatedBy?: number } = { type: action };
+            const userId = Cookies.get('userId');
+            let requestBody: { type: string; rejectionReason?: string; updatedBy?: number } = {
+                type: action,
+                updatedBy: Number(userId)
+            };
 
             if (action === 'REJECT') {
                 if (!rejectionReason.trim()) {
@@ -189,7 +193,6 @@ export default function Page() {
                     setActionLoading(null);
                     return;
                 }
-                const userId = Cookies.get('userId');
                 requestBody = {
                     type: 'REJECT',
                     rejectionReason: rejectionReason,
